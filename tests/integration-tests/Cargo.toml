@@ -1,0 +1,28 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[[test]]
+test = true
+name = "tests"
+path = "src/tests.rs"
+
+[dependencies]
+# Internal dependencies
+gateway = { workspace = true }
+testing = { workspace = true }
+configuration = { workspace = true }
+aggregation = { workspace = true, features = ["testing"] }
+protocol = { workspace = true }
+models = { workspace = true }
+rpc-client = { workspace = true }
+
+# External dependencies
+anyhow = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+axum = { workspace = true }
+tower = { workspace = true, features = ["util"] }
+http-body-util = { workspace = true }

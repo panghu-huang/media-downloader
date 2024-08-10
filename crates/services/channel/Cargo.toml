@@ -1,0 +1,18 @@
+[package]
+name = "channel"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Internal dependencies
+protocol = { workspace = true }
+rpc-client = { workspace = true }
+models = { workspace = true }
+
+# External dependencies
+async-trait = { workspace = true }
+anyhow = { workspace = true }
+reqwest = { workspace = true }
+http = { workspace = true }
+scraper = { workspace = true }
+tokio = { workspace = true, features = ["macros"] }

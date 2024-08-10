@@ -1,0 +1,58 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/models",
+  "crates/protocol",
+  "crates/services/media",
+  "crates/services/channel",
+  "crates/rpc-client",
+  "crates/gateway",
+  "crates/testing",
+  "crates/configuration",
+  "crates/services/aggregation",
+  "tests/integration-tests",
+]
+default-members = ["crates/gateway"]
+
+[workspace.dependencies]
+# Dependencies
+anyhow = "1.0.86"
+thiserror = "1.0.61"
+tonic = "0.11.0"
+tonic-build = "0.11.0"
+serde = "1.0"
+serde_json = "1.0.117"
+bytes = "1.6.0"
+proto = "0.1.2"
+tokio = "1.37.0"
+tokio-stream = "0.1.15"
+tower = "0.4.13"
+config = "0.14.0"
+axum = "0.7.5"
+axum-extra = "0.9.2"
+http-body-util = "0.1.1"
+log = "0.4.21"
+sqlx = "0.7.4"
+jsonwebtoken = "8.3.0"
+chrono = "0.4.23"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tower-http = "0.5.2"
+async-trait = "0.1.81"
+reqwest = { version = "0.12.5", features = ["http2", "rustls-tls", "gzip"] }
+http = "1.1.0"
+scraper = "0.20.0"
+
+# Internal dependencies
+gateway = { path = "crates/gateway" }
+models = { path = "crates/models" }
+protocol = { path = "crates/protocol" }
+rpc-client = { path = "crates/rpc-client" }
+configuration = { path = "crates/configuration" }
+
+## Services
+aggregation = { path = "crates/services/aggregation" }
+channel = { path = "crates/services/channel" }
+media = { path = "crates/services/media" }
+## Testing
+testing = { path = "crates/testing" }

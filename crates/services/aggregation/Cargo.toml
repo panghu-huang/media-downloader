@@ -1,0 +1,19 @@
+[package]
+name = "aggregation"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+testing = ["dep:testing"]
+
+[dependencies]
+anyhow = { workspace = true }
+log = { workspace = true }
+
+# Internal dependencies
+configuration = { workspace = true }
+channel = { workspace = true }
+protocol = { workspace = true }
+rpc-client = { workspace = true }
+models = { workspace = true }
+testing = { workspace = true, optional = true }
