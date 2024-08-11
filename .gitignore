@@ -3,3 +3,4 @@ config/*.toml
 .env
 .DS_Store
 tarpaulin-report.html
+*.mp4

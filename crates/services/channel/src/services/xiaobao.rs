@@ -1,53 +1,97 @@
 use crate::common::EasySelector;
+use crate::common::{download_video, DownloadVideoOptions};
+use crate::services::DownloadTVShowOptions;
 use crate::services::MediaChannelExt;
-use crate::services::{DownloadTVShowOptions, DownloadedTVShow};
+use protocol::channel::DownloadTVShowResponse;
+use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
 
-pub struct TVShowDetails {
+pub struct MediaDetails {
   name: String,
   year: u32,
+}
+
+pub trait MediaDetailsParser {
+  fn parse_media_details(&self) -> anyhow::Result<MediaDetails>;
 }
 
 pub struct XiaobaoTV {
   host: String,
 }
 
+#[async_trait::async_trait]
 impl MediaChannelExt for XiaobaoTV {
-  async fn download_tv_show(options: DownloadTVShowOptions) -> anyhow::Result<DownloadedTVShow> {
-    todo!()
+  async fn download_tv_show(
+    &self,
+    options: DownloadTVShowOptions,
+  ) -> anyhow::Result<DownloadTVShowResponse> {
+    let html = self
+      .fetch_tv_show_web_page_html(
+        &options.tv_show_id,
+        options.tv_show_season_number,
+        options.tv_show_episode_number,
+      )
+      .await?;
+
+    let download_url = self.extract_download_url_from_web_page_html(&html).await?;
+
+    let file_name = format!(
+      "{}-{}-{}.mp4",
+      options.tv_show_id, options.tv_show_season_number, options.tv_show_episode_number
+    );
+
+    let destination_path = options.destination_dir.join(file_name);
+
+    download_video(DownloadVideoOptions {
+      download_url: &download_url,
+      destination_path: &destination_path,
+      parallel_size: 10,
+    })
+    .await?;
+
+    let details = self.extract_media_details_from_web_page(&html).await?;
+
+    Ok(DownloadTVShowResponse {
+      tv_show_id: options.tv_show_id,
+      tv_show_season_number: options.tv_show_season_number,
+      tv_show_episode_number: options.tv_show_episode_number,
+      tv_show_name: details.name,
+      tv_show_year: details.year,
+      destination_path,
+    })
   }
 }
 
 impl XiaobaoTV {
-  async fn extract_tv_show_details_from_web_page(
+  async fn extract_download_url_from_web_page_html(
     &self,
-    tv_show_id: String,
-    tv_season_number: u32,
-    tv_episode_number: u32,
-  ) -> anyhow::Result<TVShowDetails> {
-    let tv_show_web_page = self.tv_show_web_page(tv_show_id, tv_season_number, tv_episode_number);
+    web_page_html: &str,
+  ) -> anyhow::Result<String> {
+    let reg = Regex::new(r#"","url":"((\S)+)","url_next"#)?;
 
-    let html = self.fetch_web_page_html(&tv_show_web_page).await?;
+    let caps = reg.captures(web_page_html);
 
-    Self::parse_details_from_html(&html)
+    Ok(caps.unwrap().get(1).unwrap().as_str().replace("\\/", "/"))
   }
 
-  fn parse_details_from_html(html: &str) -> anyhow::Result<TVShowDetails> {
-    let document = Html::parse_document(html);
+  async fn extract_media_details_from_web_page(
+    &self,
+    tv_show_web_page_html: &str,
+  ) -> anyhow::Result<MediaDetails> {
+    Html::parse_document(tv_show_web_page_html).parse_media_details()
+  }
 
-    let title_selector = Selector::parse(".title.text-fff").unwrap();
+  async fn fetch_tv_show_web_page_html(
+    &self,
+    tv_show_id: &str,
+    tv_show_season_number: u32,
+    tv_show_episode_number: u32,
+  ) -> anyhow::Result<String> {
+    let web_page_url =
+      self.tv_show_web_page_url(tv_show_id, tv_show_season_number, tv_show_episode_number);
 
-    let title_element = document.select(&title_selector).last().unwrap();
-
-    let year_selector = Selector::parse(".myui-player__data > .text-muted > .text-muted").unwrap();
-
-    let year_element = document.select(&year_selector).last().unwrap();
-
-    Ok(TVShowDetails {
-      name: title_element.inner_text(),
-      year: year_element.inner_text().parse()?,
-    })
+    self.fetch_web_page_html(&web_page_url).await
   }
 
   async fn fetch_web_page_html(&self, web_page_url: &str) -> anyhow::Result<String> {
@@ -71,15 +115,15 @@ impl XiaobaoTV {
     Ok(html)
   }
 
-  fn tv_show_web_page(
+  fn tv_show_web_page_url(
     &self,
-    tv_show_id: String,
-    tv_season_number: u32,
-    tv_episode_number: u32,
+    tv_show_id: &str,
+    tv_show_season_number: u32,
+    tv_show_episode_number: u32,
   ) -> String {
     format!(
       "https://{}/index.php/vod/play/id/{}/sid/{}/nid/{}.html",
-      self.host, tv_show_id, tv_season_number, tv_episode_number,
+      self.host, tv_show_id, tv_show_season_number, tv_show_episode_number,
     )
   }
 }
@@ -92,28 +136,68 @@ impl XiaobaoTV {
   }
 }
 
+impl MediaDetailsParser for Html {
+  fn parse_media_details(&self) -> anyhow::Result<MediaDetails> {
+    let title_selector = Selector::parse(".title.text-fff").unwrap();
+
+    let title_element = self.select(&title_selector).next().unwrap();
+
+    let year_selector = Selector::parse(".myui-player__data > .text-muted > .text-muted").unwrap();
+
+    let year_element = self.select(&year_selector).last().unwrap();
+
+    Ok(MediaDetails {
+      name: title_element.inner_text(),
+      year: year_element.inner_text().parse()?,
+    })
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
 
   #[tokio::test]
   async fn test_extract_tv_show_details_from_web_page() {
-    let tv_show_id = 548;
+    let tv_show_id = 548.to_string();
     let tv_show_season_number = 1;
     let tv_show_episode_number = 1;
 
     let xiaobaotv = XiaobaoTV::new("xiaoxintv.com");
 
-    let tv_show_details = xiaobaotv
-      .extract_tv_show_details_from_web_page(
-        tv_show_id.to_string(),
-        tv_show_season_number,
-        tv_show_episode_number,
-      )
+    let html = xiaobaotv
+      .fetch_tv_show_web_page_html(&tv_show_id, tv_show_season_number, tv_show_episode_number)
       .await
       .unwrap();
 
-    assert_eq!(tv_show_details.year, 1999);
+    let tv_show_details = xiaobaotv
+      .extract_media_details_from_web_page(&html)
+      .await
+      .unwrap();
+
     assert_eq!(tv_show_details.name, "海贼王");
+    assert_eq!(tv_show_details.year, 1999);
+  }
+
+  #[tokio::test]
+  async fn test_download_tv_show() {
+    let tv_show_id = 548.to_string();
+    let tv_show_season_number = 1;
+    let tv_show_episode_number = 1;
+
+    let xiaobaotv = XiaobaoTV::new("xiaoxintv.com");
+
+    let destination_dir = std::env::current_dir().unwrap().join("downloads");
+
+    let download_opts = DownloadTVShowOptions {
+      tv_show_id: tv_show_id.clone(),
+      tv_show_season_number,
+      tv_show_episode_number,
+      destination_dir,
+    };
+
+    let res = xiaobaotv.download_tv_show(download_opts).await.unwrap();
+
+    assert_eq!(res.tv_show_id, tv_show_id);
   }
 }

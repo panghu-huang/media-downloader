@@ -4,3 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+# Internal dependencies
+protocol = { workspace = true }
+rpc-client = { workspace = true }
+models = { workspace = true }
+
+# External dependencies
+tokio = { workspace = true }
+log = { workspace = true }

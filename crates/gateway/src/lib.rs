@@ -47,10 +47,7 @@ impl Gateway {
     let state = AppState::new(self.client.clone(), self.config.clone());
 
     let router = Router::new()
-      .route(
-        "/tv_shows/download",
-        post(tv_shows::create_download_tv_show_request),
-      )
+      .route("/tv_shows/download", post(tv_shows::download_tv_show))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))
       // Add a revision to the response headers

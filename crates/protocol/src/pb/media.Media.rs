@@ -1,13 +1,13 @@
 /// Generated client implementations.
-pub mod downloader_client {
+pub mod media_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
     #[derive(Debug, Clone)]
-    pub struct DownloaderClient<T> {
+    pub struct MediaClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl DownloaderClient<tonic::transport::Channel> {
+    impl MediaClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -18,7 +18,7 @@ pub mod downloader_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> DownloaderClient<T>
+    impl<T> MediaClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -36,7 +36,7 @@ pub mod downloader_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> DownloaderClient<InterceptedService<T, F>>
+        ) -> MediaClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -50,7 +50,7 @@ pub mod downloader_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            DownloaderClient::new(InterceptedService::new(inner, interceptor))
+            MediaClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -85,11 +85,8 @@ pub mod downloader_client {
         }
         pub async fn download_tv_show(
             &mut self,
-            request: impl tonic::IntoRequest<crate::downloader::DownloadTVShowRequest>,
-        ) -> std::result::Result<
-            tonic::Response<crate::downloader::DownloadTVShowResponse>,
-            tonic::Status,
-        > {
+            request: impl tonic::IntoRequest<crate::media::DownloadTVShowRequest>,
+        ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -101,32 +98,29 @@ pub mod downloader_client {
                 })?;
             let codec = crate::json_codec::JsonCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/downloader.Downloader/DownloadTvShow",
+                "/media.Media/DownloadTvShow",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("downloader.Downloader", "DownloadTvShow"));
+                .insert(GrpcMethod::new("media.Media", "DownloadTvShow"));
             self.inner.unary(req, path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod downloader_server {
+pub mod media_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with DownloaderServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with MediaServer.
     #[async_trait]
-    pub trait Downloader: Send + Sync + 'static {
+    pub trait Media: Send + Sync + 'static {
         async fn download_tv_show(
             &self,
-            request: tonic::Request<crate::downloader::DownloadTVShowRequest>,
-        ) -> std::result::Result<
-            tonic::Response<crate::downloader::DownloadTVShowResponse>,
-            tonic::Status,
-        >;
+            request: tonic::Request<crate::media::DownloadTVShowRequest>,
+        ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status>;
     }
     #[derive(Debug)]
-    pub struct DownloaderServer<T: Downloader> {
+    pub struct MediaServer<T: Media> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
@@ -134,7 +128,7 @@ pub mod downloader_server {
         max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: Downloader> DownloaderServer<T> {
+    impl<T: Media> MediaServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -186,9 +180,9 @@ pub mod downloader_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for DownloaderServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for MediaServer<T>
     where
-        T: Downloader,
+        T: Media,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -204,28 +198,25 @@ pub mod downloader_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/downloader.Downloader/DownloadTvShow" => {
+                "/media.Media/DownloadTvShow" => {
                     #[allow(non_camel_case_types)]
-                    struct DownloadTvShowSvc<T: Downloader>(pub Arc<T>);
+                    struct DownloadTvShowSvc<T: Media>(pub Arc<T>);
                     impl<
-                        T: Downloader,
-                    > tonic::server::UnaryService<
-                        crate::downloader::DownloadTVShowRequest,
-                    > for DownloadTvShowSvc<T> {
-                        type Response = crate::downloader::DownloadTVShowResponse;
+                        T: Media,
+                    > tonic::server::UnaryService<crate::media::DownloadTVShowRequest>
+                    for DownloadTvShowSvc<T> {
+                        type Response = crate::Empty;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<
-                                crate::downloader::DownloadTVShowRequest,
-                            >,
+                            request: tonic::Request<crate::media::DownloadTVShowRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Downloader>::download_tv_show(&inner, request).await
+                                <T as Media>::download_tv_show(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -268,7 +259,7 @@ pub mod downloader_server {
             }
         }
     }
-    impl<T: Downloader> Clone for DownloaderServer<T> {
+    impl<T: Media> Clone for MediaServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -280,7 +271,7 @@ pub mod downloader_server {
             }
         }
     }
-    impl<T: Downloader> Clone for _Inner<T> {
+    impl<T: Media> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(Arc::clone(&self.0))
         }
@@ -290,7 +281,7 @@ pub mod downloader_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: Downloader> tonic::server::NamedService for DownloaderServer<T> {
-        const NAME: &'static str = "downloader.Downloader";
+    impl<T: Media> tonic::server::NamedService for MediaServer<T> {
+        const NAME: &'static str = "media.Media";
     }
 }

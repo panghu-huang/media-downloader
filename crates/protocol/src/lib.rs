@@ -1,6 +1,7 @@
 mod json_codec;
 
 pub mod channel;
+pub mod media;
 
 pub mod tonic {
   pub use ::tonic::*;

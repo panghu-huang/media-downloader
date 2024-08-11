@@ -38,11 +38,11 @@ impl AggregationService {
 }
 
 pub fn create_aggregation_service(
-  _configuration: &Configuration,
+  configuration: &Configuration,
   _pool: &ConnectionPool,
   _rpc_client: &RpcClient,
 ) -> AggregationService {
-  let channel = ChannelService::new();
+  let channel = ChannelService::new(configuration);
 
   AggregationService { channel }
 }

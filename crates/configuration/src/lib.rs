@@ -16,8 +16,16 @@ pub struct AppConfiguration {
   pub services_addr: String,
   #[serde(rename = "gateway-addr")]
   pub gateway_addr: String,
-  #[serde(rename = "encoding-key")]
-  pub encoding_key: String,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct MediaChannelConfig {
+  pub xiaobao: XiaobaoTVConfig,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct XiaobaoTVConfig {
+  pub host: String,
 }
 
 #[derive(Deserialize, Clone)]
@@ -30,6 +38,7 @@ pub struct DatabaseConfig {
 pub struct UserConfiguration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
+  pub channels: MediaChannelConfig,
 }
 
 // Configuration is a structure composed of user configuration and environment configuration.
@@ -38,6 +47,7 @@ pub struct Configuration {
   pub environment: Environment,
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
+  pub channels: MediaChannelConfig,
 }
 
 impl Configuration {
@@ -76,6 +86,7 @@ impl Configuration {
       environment: env,
       app: user_config.app,
       database: user_config.database,
+      channels: user_config.channels,
     })
   }
 }
