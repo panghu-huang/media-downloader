@@ -13,6 +13,7 @@ log = { workspace = true }
 # Internal dependencies
 configuration = { workspace = true }
 channel = { workspace = true }
+media = { workspace = true }
 protocol = { workspace = true }
 rpc-client = { workspace = true }
 models = { workspace = true }

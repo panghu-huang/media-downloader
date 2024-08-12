@@ -1,0 +1,2 @@
+[alias]
+run-tests = "nextest run --workspace --no-fail-fast --failure-output final"

@@ -86,7 +86,10 @@ pub mod channel_client {
         pub async fn download_tv_show(
             &mut self,
             request: impl tonic::IntoRequest<crate::channel::DownloadTVShowRequest>,
-        ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status> {
+        ) -> std::result::Result<
+            tonic::Response<tonic::codec::Streaming<crate::channel::DownloadProgress>>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -103,7 +106,7 @@ pub mod channel_client {
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(GrpcMethod::new("channel.Channel", "DownloadTvShow"));
-            self.inner.unary(req, path, codec).await
+            self.inner.server_streaming(req, path, codec).await
         }
         pub async fn get_tv_show_metadata(
             &mut self,
@@ -139,10 +142,22 @@ pub mod channel_server {
     /// Generated trait containing gRPC methods that should be implemented for use with ChannelServer.
     #[async_trait]
     pub trait Channel: Send + Sync + 'static {
+        /// Server streaming response type for the DownloadTvShow method.
+        type DownloadTvShowStream: tonic::codegen::tokio_stream::Stream<
+                Item = std::result::Result<
+                    crate::channel::DownloadProgress,
+                    tonic::Status,
+                >,
+            >
+            + Send
+            + 'static;
         async fn download_tv_show(
             &self,
             request: tonic::Request<crate::channel::DownloadTVShowRequest>,
-        ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status>;
+        ) -> std::result::Result<
+            tonic::Response<Self::DownloadTvShowStream>,
+            tonic::Status,
+        >;
         async fn get_tv_show_metadata(
             &self,
             request: tonic::Request<crate::channel::GetTVShowMetadataRequest>,
@@ -235,11 +250,13 @@ pub mod channel_server {
                     struct DownloadTvShowSvc<T: Channel>(pub Arc<T>);
                     impl<
                         T: Channel,
-                    > tonic::server::UnaryService<crate::channel::DownloadTVShowRequest>
-                    for DownloadTvShowSvc<T> {
-                        type Response = crate::Empty;
+                    > tonic::server::ServerStreamingService<
+                        crate::channel::DownloadTVShowRequest,
+                    > for DownloadTvShowSvc<T> {
+                        type Response = crate::channel::DownloadProgress;
+                        type ResponseStream = T::DownloadTvShowStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
@@ -273,7 +290,7 @@ pub mod channel_server {
                                 max_decoding_message_size,
                                 max_encoding_message_size,
                             );
-                        let res = grpc.unary(method, req).await;
+                        let res = grpc.server_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)

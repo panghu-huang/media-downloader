@@ -15,18 +15,37 @@ impl MediaExt for MediaService {
     request: Request<DownloadTVShowRequest>,
   ) -> tonic::Result<Response<protocol::Empty>> {
     let request = request.into_inner();
+    log::info!(
+      "Downloading TV show {} (S{}E{})",
+      request.tv_show_id,
+      request.tv_show_season_number,
+      request.tv_show_episode_number
+    );
 
     let mut channel_client = self.rpc_client.channel.clone();
 
     tokio::spawn(async move {
-      if let Err(err) = channel_client.download_tv_show(request.clone()).await {
-        log::info!(
-          "Failed to download TV show {}(E{}S{}): {}",
-          request.tv_show_id,
-          request.tv_show_season_number,
-          request.tv_show_episode_number,
-          err,
-        );
+      let res = channel_client.download_tv_show(request.clone()).await;
+
+      match res {
+        Ok(res) => {
+          log::info!("successful to request download tv show");
+
+          let mut progress = res.into_inner();
+
+          while let Some(evt) = progress.message().await.unwrap() {
+            log::info!("Event {:#?}", evt);
+          }
+        }
+        Err(err) => {
+          log::info!(
+            "Failed to download TV show {}(S{}E{}): {}",
+            request.tv_show_id,
+            request.tv_show_season_number,
+            request.tv_show_episode_number,
+            err,
+          );
+        }
       }
     });
 

@@ -12,3 +12,4 @@ models = { workspace = true }
 # External dependencies
 tokio = { workspace = true }
 log = { workspace = true }
+tokio-stream = { workspace = true }

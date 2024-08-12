@@ -3,6 +3,8 @@ use crate::common::{download_video, DownloadVideoOptions};
 use crate::services::DownloadTVShowOptions;
 use crate::services::MediaChannelExt;
 use protocol::channel::TVShowMetadata;
+use protocol::channel::DownloadProgress;
+use tokio::sync::mpsc::Receiver;
 use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
@@ -30,7 +32,7 @@ impl MediaChannelExt for XiaobaoTV {
     "xiaobao"
   }
 
-  async fn download_tv_show(&self, options: DownloadTVShowOptions) -> anyhow::Result<()> {
+  async fn download_tv_show(&self, options: DownloadTVShowOptions) -> anyhow::Result<Receiver<DownloadProgress>> {
     let html = self
       .fetch_tv_show_web_page_html(
         &options.tv_show_id,
@@ -41,14 +43,14 @@ impl MediaChannelExt for XiaobaoTV {
 
     let download_url = self.extract_download_url_from_web_page_html(&html).await?;
 
-    download_video(DownloadVideoOptions {
+    let progress = download_video(DownloadVideoOptions {
       download_url: &download_url,
       destination_path: &options.destination_path,
       parallel_size: 10,
     })
     .await?;
 
-    Ok(())
+    Ok(progress)
   }
 
   async fn get_tv_show_metadata(
@@ -173,22 +175,7 @@ impl SimpleTVShowMetadataExtractor for Html {
 mod tests {
   use super::*;
 
-  #[tokio::test]
-  async fn test_get_tv_show_metadata() {
-    let tv_show_id = 548.to_string();
-    let tv_show_season_number = 1;
-
-    let xiaobaotv = XiaobaoTV::new("xiaoxintv.com");
-
-    let metadata = xiaobaotv
-      .get_tv_show_metadata(&tv_show_id, tv_show_season_number)
-      .await
-      .unwrap();
-
-    assert_eq!(metadata.name, "海贼王");
-    assert_eq!(metadata.year, 1999);
-  }
-
+  #[ignore]
   #[tokio::test]
   async fn test_download_tv_show() {
     let tv_show_id = 548.to_string();

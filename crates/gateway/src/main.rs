@@ -8,7 +8,7 @@ use tracing_subscriber::fmt::time::ChronoLocal;
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
   tracing_subscriber::fmt()
-    .with_max_level(tracing::Level::DEBUG)
+    .with_max_level(tracing::Level::INFO)
     .with_timer(ChronoLocal::new("%Y-%m-%d %H:%M:%S%.3f".to_string()))
     .init();
 

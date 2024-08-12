@@ -1,11 +1,13 @@
 use crate::common::temporary_directory;
 use m3u8_rs::{parse_playlist_res, MediaPlaylist, Playlist};
+use protocol::channel::DownloadProgress;
 use reqwest::Client;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::sync::Arc;
 use tokio::fs;
+use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::sync::Semaphore;
 use url::Url;
 
@@ -15,37 +17,73 @@ pub struct DownloadVideoOptions<'a> {
   pub parallel_size: usize,
 }
 
-pub async fn download_video(options: DownloadVideoOptions<'_>) -> anyhow::Result<()> {
+pub async fn download_video(
+  options: DownloadVideoOptions<'_>,
+) -> anyhow::Result<Receiver<DownloadProgress>> {
   let playlist = fetch_media_playlist(options.download_url).await?;
 
-  log::info!("Downloading segments of playlist ... ");
-  let updated_playlist = download_segments_of_playlist(playlist, options.parallel_size).await?;
+  let total_segments = playlist.segments.len();
+  let (sender, receiver) = channel(total_segments + 1);
 
-  log::info!("Writing to file system ... ");
+  sender
+    .send(DownloadProgress::Started {
+      total_segments_of_meida: total_segments,
+      started_at: chrono::Utc::now().to_string(),
+    })
+    .await?;
 
-  let mut bytes: Vec<u8> = Vec::new();
+  tokio::spawn({
+    let parallel_size = options.parallel_size;
+    let destination_path = options.destination_path.to_path_buf();
 
-  updated_playlist.write_to(&mut bytes)?;
+    async move {
+      log::info!("Downloading segments of playlist ... ");
+      let updated_playlist =
+        download_segments_of_playlist(playlist, parallel_size, &sender).await?;
 
-  let destination_file_name = options.destination_path.file_name().unwrap();
+      log::info!("Writing to file system ... ");
 
-  let m3u8_file_name = format!("{}.m3u8", destination_file_name.to_str().unwrap());
-  let m3u8_path = temporary_directory().await?.join(m3u8_file_name);
+      let mut bytes: Vec<u8> = Vec::new();
 
-  fs::write(&m3u8_path, bytes).await?;
+      updated_playlist.write_to(&mut bytes)?;
 
-  log::info!("Transforming video ... ");
+      let destination_file_name = destination_path.file_name().unwrap();
 
-  fs::create_dir_all(options.destination_path.parent().unwrap()).await?;
+      let m3u8_file_name = format!("{}.m3u8", destination_file_name.to_str().unwrap());
+      let m3u8_path = temporary_directory().await?.join(m3u8_file_name);
 
-  transform_video(&m3u8_path, options.destination_path).await?;
+      fs::write(&m3u8_path, bytes).await?;
 
-  Ok(())
+      sender
+        .send(DownloadProgress::InProgress {
+          message: "Transforming video ... ".to_string(),
+          started_at: chrono::Utc::now().to_string(),
+        })
+        .await?;
+
+      log::info!("Transforming video ... ");
+
+      fs::create_dir_all(destination_path.parent().unwrap()).await?;
+
+      transform_video(&m3u8_path, &destination_path).await?;
+
+      sender
+        .send(DownloadProgress::Done {
+          completed_at: chrono::Utc::now().to_string(),
+        })
+        .await?;
+
+      Ok(()) as anyhow::Result<()>
+    }
+  });
+
+  Ok(receiver)
 }
 
 async fn download_segments_of_playlist(
   mut playlist: MediaPlaylist,
   parallel_size: usize,
+  sender: &Sender<DownloadProgress>,
 ) -> anyhow::Result<MediaPlaylist> {
   let semaphore = Arc::new(Semaphore::new(parallel_size));
 
@@ -55,12 +93,20 @@ async fn download_segments_of_playlist(
     let semaphore = semaphore.clone();
 
     let handle = tokio::spawn({
+      let sender = sender.clone();
       let uri = segment.uri.clone();
 
       async move {
         let _permit = semaphore.acquire().await?;
 
         let downloaded_path = download_media_segment(&uri).await?;
+
+        sender
+          .send(DownloadProgress::InProgress {
+            message: format!("Segment downloaded: {}", uri,),
+            started_at: chrono::Utc::now().to_string(),
+          })
+          .await?;
 
         // Wait 2s for avoid 429 error
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;

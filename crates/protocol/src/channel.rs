@@ -33,6 +33,21 @@ pub struct TVShowMetadata {
   pub source_download_url: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum DownloadProgress {
+  Started {
+    total_segments_of_meida: usize,
+    started_at: String,
+  },
+  InProgress {
+    message: String,
+    started_at: String,
+  },
+  Done {
+    completed_at: String,
+  },
+}
+
 mod channel_inner {
   include!("./pb/channel.Channel.rs");
 }

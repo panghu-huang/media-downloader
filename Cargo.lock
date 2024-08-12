@@ -25,6 +25,7 @@ dependencies = [
  "channel",
  "configuration",
  "log",
+ "media",
  "models",
  "protocol",
  "rpc-client",
@@ -369,6 +370,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "chrono",
  "configuration",
  "http 1.1.0",
  "log",
@@ -378,6 +380,7 @@ dependencies = [
  "reqwest",
  "scraper",
  "tokio",
+ "tokio-stream",
  "url",
 ]
 
@@ -1489,6 +1492,7 @@ dependencies = [
  "protocol",
  "rpc-client",
  "tokio",
+ "tokio-stream",
 ]
 
 [[package]]

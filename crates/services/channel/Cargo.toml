@@ -19,3 +19,5 @@ regex = { workspace = true }
 m3u8-rs = { workspace = true }
 url = { workspace = true }
 log = { workspace = true }
+tokio-stream = { workspace = true }
+chrono = { workspace = true }

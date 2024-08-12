@@ -1,7 +1,8 @@
 pub mod xiaobao;
 
-use protocol::channel::TVShowMetadata;
+use protocol::channel::{DownloadProgress, TVShowMetadata};
 use std::path::PathBuf;
+use tokio::sync::mpsc::Receiver;
 
 pub struct DownloadTVShowOptions {
   pub tv_show_id: String,
@@ -13,7 +14,10 @@ pub struct DownloadTVShowOptions {
 #[async_trait::async_trait]
 pub trait MediaChannelExt: Send + Sync {
   fn channel_name(&self) -> &'static str;
-  async fn download_tv_show(&self, options: DownloadTVShowOptions) -> anyhow::Result<()>;
+  async fn download_tv_show(
+    &self,
+    options: DownloadTVShowOptions,
+  ) -> anyhow::Result<Receiver<DownloadProgress>>;
   async fn get_tv_show_metadata(
     &self,
     tv_show_id: &str,
