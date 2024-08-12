@@ -6,7 +6,8 @@ fn main() {
     codec crate::json_codec::JsonCodec;
 
     service Channel {
-      rpc DownloadTvShow(crate::channel::DownloadTVShowRequest) returns (crate::channel::DownloadTVShowResponse) {}
+      rpc DownloadTvShow(crate::channel::DownloadTVShowRequest) returns (crate::Empty) {}
+      rpc GetTvShowMetadata(crate::channel::GetTVShowMetadataRequest) returns (crate::channel::TVShowMetadata) {}
     }
   };
 
@@ -16,6 +17,7 @@ fn main() {
 
     service Media {
       rpc DownloadTvShow(crate::media::DownloadTVShowRequest) returns (crate::Empty) {}
+      rpc GetTvShowMetadata(crate::media::GetTVShowMetadataRequest) returns (crate::media::TVShowMetadata) {}
     }
   };
 

@@ -7,7 +7,7 @@ mod state;
 
 use crate::error::AppError;
 use axum::http::{HeaderValue, Method};
-use axum::routing::post;
+use axum::routing::{get, post};
 use axum::Router;
 use configuration::Configuration;
 use controllers::tv_shows;
@@ -47,6 +47,10 @@ impl Gateway {
     let state = AppState::new(self.client.clone(), self.config.clone());
 
     let router = Router::new()
+      .route(
+        "/channels/:channel_name/tv_shows/:tv_show_id",
+        get(tv_shows::get_tv_show_metadata),
+      )
       .route("/tv_shows/download", post(tv_shows::download_tv_show))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))

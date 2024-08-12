@@ -1,17 +1,20 @@
 use configuration::Configuration;
 use protocol::channel::ChannelClient;
+use protocol::media::MediaClient;
 use protocol::tonic::transport::{Channel as TransportChannel, Endpoint};
 
 #[derive(Clone)]
 pub struct RpcClient {
   pub channel: ChannelClient<TransportChannel>,
+  pub media: MediaClient<TransportChannel>,
 }
 
 impl RpcClient {
   pub fn new(channel: TransportChannel) -> Self {
+    let media = MediaClient::new(channel.clone());
     let channel = ChannelClient::new(channel);
 
-    Self { channel }
+    Self { channel, media }
   }
 }
 

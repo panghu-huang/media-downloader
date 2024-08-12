@@ -1,6 +1,7 @@
 use protocol::media::DownloadTVShowRequest;
 use protocol::media::MediaExt;
-use protocol::tonic::{async_trait, Request, Response, Status};
+use protocol::media::{GetTVShowMetadataRequest, TVShowMetadata};
+use protocol::tonic::{self, async_trait, Request, Response};
 use rpc_client::RpcClient;
 
 pub struct MediaService {
@@ -12,7 +13,7 @@ impl MediaExt for MediaService {
   async fn download_tv_show(
     &self,
     request: Request<DownloadTVShowRequest>,
-  ) -> Result<Response<protocol::Empty>, Status> {
+  ) -> tonic::Result<Response<protocol::Empty>> {
     let request = request.into_inner();
 
     let mut channel_client = self.rpc_client.channel.clone();
@@ -22,7 +23,7 @@ impl MediaExt for MediaService {
         log::info!(
           "Failed to download TV show {}(E{}S{}): {}",
           request.tv_show_id,
-          request.tv_show_sesson_number,
+          request.tv_show_season_number,
           request.tv_show_episode_number,
           err,
         );
@@ -30,6 +31,22 @@ impl MediaExt for MediaService {
     });
 
     Ok(Response::new(protocol::Empty {}))
+  }
+
+  async fn get_tv_show_metadata(
+    &self,
+    request: Request<GetTVShowMetadataRequest>,
+  ) -> tonic::Result<Response<TVShowMetadata>> {
+    let request = request.into_inner();
+
+    let mut channel_client = self.rpc_client.channel.clone();
+
+    let res = channel_client
+      .get_tv_show_metadata(request.clone())
+      .await?
+      .into_inner();
+
+    Ok(Response::new(res))
   }
 }
 

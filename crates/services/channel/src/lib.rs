@@ -3,9 +3,12 @@ mod services;
 
 use configuration::Configuration;
 use protocol::channel::ChannelExt;
-use protocol::channel::{DownloadTVShowRequest, DownloadTVShowResponse};
+use protocol::channel::DownloadTVShowRequest;
+use protocol::channel::{GetTVShowMetadataRequest, TVShowMetadata};
+use protocol::tonic;
 use protocol::tonic::{async_trait, Request, Response, Status};
 use services::{DownloadTVShowOptions, MediaChannelExt};
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -19,27 +22,56 @@ impl ChannelExt for ChannelService {
   async fn download_tv_show(
     &self,
     request: Request<DownloadTVShowRequest>,
-  ) -> Result<Response<DownloadTVShowResponse>, Status> {
+  ) -> Result<Response<protocol::Empty>, Status> {
     let request = request.into_inner();
-    let destination_dir = self.destination_dir.clone();
+
+    let file_name = format!(
+      "{}-{}-{}.mp4",
+      request.tv_show_id, request.tv_show_season_number, request.tv_show_episode_number
+    );
 
     let options = DownloadTVShowOptions {
       tv_show_id: request.tv_show_id,
       tv_show_season_number: request.tv_show_season_number,
       tv_show_episode_number: request.tv_show_episode_number,
-      destination_dir,
+      destination_path: self.destination_dir.join(file_name),
     };
 
-    let channel = self.channels.get(&request.channel).ok_or_else(|| {
-      Status::invalid_argument(format!("No channel '{}' found.", request.channel))
-    })?;
+    let channel = self.get_channel_by_name(&request.channel)?;
 
-    let res = channel
+    channel
       .download_tv_show(options)
       .await
       .map_err(|e| Status::internal(format!("Error occurred during download TV show: {}", e)))?;
 
-    Ok(Response::new(res))
+    Ok(Response::new(protocol::Empty {}))
+  }
+
+  async fn get_tv_show_metadata(
+    &self,
+    request: Request<GetTVShowMetadataRequest>,
+  ) -> tonic::Result<Response<TVShowMetadata>> {
+    let request = request.into_inner();
+
+    let channel = self.get_channel_by_name(&request.channel)?;
+
+    let metadata = channel
+      .get_tv_show_metadata(&request.tv_show_id, request.tv_show_season_number)
+      .await
+      .map_err(|e| Status::internal(format!("Failed to get TV show metadata: {}", e)))?;
+
+    Ok(Response::new(metadata))
+  }
+}
+
+impl ChannelService {
+  fn get_channel_by_name(&self, name: &str) -> tonic::Result<&dyn MediaChannelExt> {
+    let channel = self
+      .channels
+      .get(name)
+      .ok_or_else(|| Status::invalid_argument(format!("No channel '{}' found.", name)))?;
+
+    Ok(channel.borrow())
   }
 }
 
@@ -48,7 +80,7 @@ impl ChannelService {
     let xiaobao = services::xiaobao::XiaobaoTV::new(&config.channels.xiaobao.host);
 
     let channels = [(
-      "xiaobao".to_owned(),
+      xiaobao.channel_name().to_owned(),
       Box::new(xiaobao) as Box<dyn MediaChannelExt>,
     )]
     .into_iter()
