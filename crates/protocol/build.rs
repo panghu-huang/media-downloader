@@ -6,7 +6,7 @@ fn main() {
     codec crate::json_codec::JsonCodec;
 
     service Channel {
-      rpc DownloadTvShow(crate::channel::DownloadTVShowRequest) returns (stream crate::channel::DownloadProgress) {}
+      rpc DownloadTvShow(crate::channel::DownloadTVShowRequest) returns (stream crate::DownloadProgressItem) {}
       rpc GetTvShowMetadata(crate::channel::GetTVShowMetadataRequest) returns (crate::channel::TVShowMetadata) {}
     }
   };

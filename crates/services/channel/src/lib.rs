@@ -3,18 +3,15 @@ mod services;
 
 use configuration::Configuration;
 use protocol::channel::ChannelExt;
-use protocol::channel::{DownloadProgress, DownloadTVShowRequest};
+use protocol::channel::DownloadTVShowRequest;
 use protocol::channel::{GetTVShowMetadataRequest, TVShowMetadata};
 use protocol::tonic;
 use protocol::tonic::{async_trait, Request, Response, Status};
+use protocol::DownloadProgressReceiver;
 use services::{DownloadTVShowOptions, MediaChannelExt};
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::pin::Pin;
-use tokio_stream::wrappers::ReceiverStream;
-use tokio_stream::Stream;
-use tokio_stream::StreamExt;
 
 pub struct ChannelService {
   destination_dir: PathBuf,
@@ -23,8 +20,7 @@ pub struct ChannelService {
 
 #[async_trait]
 impl ChannelExt for ChannelService {
-  // TODO: improve this
-  type DownloadTvShowStream = Pin<Box<dyn Stream<Item = tonic::Result<DownloadProgress>> + Send>>;
+  type DownloadTvShowStream = DownloadProgressReceiver;
 
   async fn download_tv_show(
     &self,
@@ -52,14 +48,12 @@ impl ChannelExt for ChannelService {
 
     let channel = self.get_channel_by_name(&request.channel)?;
 
-    let download_progress = channel
+    let download_progress_receiver = channel
       .download_tv_show(options)
       .await
       .map_err(|e| Status::internal(format!("Error occurred during download TV show: {}", e)))?;
 
-    Ok(Response::new(Box::pin(
-      ReceiverStream::new(download_progress).map(Ok),
-    )))
+    Ok(Response::new(download_progress_receiver))
   }
 
   async fn get_tv_show_metadata(

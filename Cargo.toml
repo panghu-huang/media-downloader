@@ -10,7 +10,8 @@ members = [
   "crates/testing",
   "crates/configuration",
   "crates/services/aggregation",
-  "tests/integration-tests",
+  "tests/integration-tests", 
+  "crates/stream",
 ]
 default-members = ["crates/gateway"]
 
@@ -45,6 +46,7 @@ scraper = "0.20.0"
 regex = "1.10.6"
 m3u8-rs = "6.0.0"
 url = "2.5.2"
+parking_lot = "0.12.3"
 
 # Internal dependencies
 gateway = { path = "crates/gateway" }
@@ -52,6 +54,7 @@ models = { path = "crates/models" }
 protocol = { path = "crates/protocol" }
 rpc-client = { path = "crates/rpc-client" }
 configuration = { path = "crates/configuration" }
+stream = { path = "crates/stream" }
 
 ## Services
 aggregation = { path = "crates/services/aggregation" }

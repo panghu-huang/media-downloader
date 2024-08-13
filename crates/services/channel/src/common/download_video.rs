@@ -1,13 +1,12 @@
 use crate::common::temporary_directory;
 use m3u8_rs::{parse_playlist_res, MediaPlaylist, Playlist};
-use protocol::channel::DownloadProgress;
+use protocol::{DownloadProgressExt, DownloadProgressReceiver, DownloadProgressStream};
 use reqwest::Client;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::str::FromStr;
 use std::sync::Arc;
 use tokio::fs;
-use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::sync::Semaphore;
 use url::Url;
 
@@ -19,18 +18,15 @@ pub struct DownloadVideoOptions<'a> {
 
 pub async fn download_video(
   options: DownloadVideoOptions<'_>,
-) -> anyhow::Result<Receiver<DownloadProgress>> {
+) -> anyhow::Result<DownloadProgressReceiver> {
   let playlist = fetch_media_playlist(options.download_url).await?;
 
   let total_segments = playlist.segments.len();
-  let (sender, receiver) = channel(total_segments + 1);
+  let download_progress_stream = stream::Stream::new(Ok);
 
-  sender
-    .send(DownloadProgress::Started {
-      total_segments_of_meida: total_segments,
-      started_at: chrono::Utc::now().to_string(),
-    })
-    .await?;
+  download_progress_stream.start(total_segments);
+
+  let receiver = download_progress_stream.recv();
 
   tokio::spawn({
     let parallel_size = options.parallel_size;
@@ -39,7 +35,7 @@ pub async fn download_video(
     async move {
       log::info!("Downloading segments of playlist ... ");
       let updated_playlist =
-        download_segments_of_playlist(playlist, parallel_size, &sender).await?;
+        download_segments_of_playlist(playlist, parallel_size, &download_progress_stream).await?;
 
       log::info!("Writing to file system ... ");
 
@@ -54,12 +50,7 @@ pub async fn download_video(
 
       fs::write(&m3u8_path, bytes).await?;
 
-      sender
-        .send(DownloadProgress::InProgress {
-          message: "Transforming video ... ".to_string(),
-          started_at: chrono::Utc::now().to_string(),
-        })
-        .await?;
+      download_progress_stream.in_progress("Transforming video ... ");
 
       log::info!("Transforming video ... ");
 
@@ -67,11 +58,7 @@ pub async fn download_video(
 
       transform_video(&m3u8_path, &destination_path).await?;
 
-      sender
-        .send(DownloadProgress::Done {
-          completed_at: chrono::Utc::now().to_string(),
-        })
-        .await?;
+      download_progress_stream.done();
 
       Ok(()) as anyhow::Result<()>
     }
@@ -83,7 +70,7 @@ pub async fn download_video(
 async fn download_segments_of_playlist(
   mut playlist: MediaPlaylist,
   parallel_size: usize,
-  sender: &Sender<DownloadProgress>,
+  stream: &DownloadProgressStream,
 ) -> anyhow::Result<MediaPlaylist> {
   let semaphore = Arc::new(Semaphore::new(parallel_size));
 
@@ -93,7 +80,7 @@ async fn download_segments_of_playlist(
     let semaphore = semaphore.clone();
 
     let handle = tokio::spawn({
-      let sender = sender.clone();
+      let stream = stream.clone();
       let uri = segment.uri.clone();
 
       async move {
@@ -101,12 +88,7 @@ async fn download_segments_of_playlist(
 
         let downloaded_path = download_media_segment(&uri).await?;
 
-        sender
-          .send(DownloadProgress::InProgress {
-            message: format!("Segment downloaded: {}", uri,),
-            started_at: chrono::Utc::now().to_string(),
-          })
-          .await?;
+        stream.in_progress("Segment downloaded: {}");
 
         // Wait 2s for avoid 429 error
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
@@ -134,14 +116,21 @@ async fn download_segments_of_playlist(
 async fn fetch_media_playlist(download_url: &str) -> anyhow::Result<MediaPlaylist> {
   let client = Client::new();
 
-  let bytes = client.get(download_url).send().await?.bytes().await?;
+  let res = client.get(download_url).send().await?;
 
-  let bytes: Vec<u8> = bytes.to_vec();
+  let status = res.status();
+  if !status.is_success() {
+    log::info!("{:#?}", res.headers());
+    anyhow::bail!("Request failed with code {}", status);
+  }
 
+  let bytes = res.bytes().await?.to_vec();
   let parsed = parse_playlist_res(&bytes);
 
-  let Ok(Playlist::MediaPlaylist(playlist)) = parsed else {
-    anyhow::bail!("Not supported format.");
+  let playlist = match parsed {
+    Ok(Playlist::MediaPlaylist(playlist)) => playlist,
+    Ok(Playlist::MasterPlaylist(_)) => anyhow::bail!("Unsupported format"),
+    Err(err) => anyhow::bail!("Fetch media playlist error: {}", err),
   };
 
   Ok(playlist)

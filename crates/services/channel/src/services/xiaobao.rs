@@ -3,8 +3,7 @@ use crate::common::{download_video, DownloadVideoOptions};
 use crate::services::DownloadTVShowOptions;
 use crate::services::MediaChannelExt;
 use protocol::channel::TVShowMetadata;
-use protocol::channel::DownloadProgress;
-use tokio::sync::mpsc::Receiver;
+use protocol::DownloadProgressReceiver;
 use regex::Regex;
 use reqwest::Client;
 use scraper::{Html, Selector};
@@ -32,7 +31,7 @@ impl MediaChannelExt for XiaobaoTV {
     "xiaobao"
   }
 
-  async fn download_tv_show(&self, options: DownloadTVShowOptions) -> anyhow::Result<Receiver<DownloadProgress>> {
+  async fn download_tv_show(&self, options: DownloadTVShowOptions) -> anyhow::Result<DownloadProgressReceiver> {
     let html = self
       .fetch_tv_show_web_page_html(
         &options.tv_show_id,

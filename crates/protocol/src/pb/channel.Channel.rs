@@ -87,7 +87,7 @@ pub mod channel_client {
             &mut self,
             request: impl tonic::IntoRequest<crate::channel::DownloadTVShowRequest>,
         ) -> std::result::Result<
-            tonic::Response<tonic::codec::Streaming<crate::channel::DownloadProgress>>,
+            tonic::Response<tonic::codec::Streaming<crate::DownloadProgressItem>>,
             tonic::Status,
         > {
             self.inner
@@ -144,10 +144,7 @@ pub mod channel_server {
     pub trait Channel: Send + Sync + 'static {
         /// Server streaming response type for the DownloadTvShow method.
         type DownloadTvShowStream: tonic::codegen::tokio_stream::Stream<
-                Item = std::result::Result<
-                    crate::channel::DownloadProgress,
-                    tonic::Status,
-                >,
+                Item = std::result::Result<crate::DownloadProgressItem, tonic::Status>,
             >
             + Send
             + 'static;
@@ -253,7 +250,7 @@ pub mod channel_server {
                     > tonic::server::ServerStreamingService<
                         crate::channel::DownloadTVShowRequest,
                     > for DownloadTvShowSvc<T> {
-                        type Response = crate::channel::DownloadProgress;
+                        type Response = crate::DownloadProgressItem;
                         type ResponseStream = T::DownloadTvShowStream;
                         type Future = BoxFuture<
                             tonic::Response<Self::ResponseStream>,

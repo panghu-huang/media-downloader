@@ -10,6 +10,8 @@ serde_json = { workspace = true }
 bytes = { workspace = true }
 tokio-stream = { workspace = true }
 models = { workspace = true }
+stream = { workspace = true }
+chrono = { workspace = true }
 
 [build-dependencies]
 proto = { workspace = true }
