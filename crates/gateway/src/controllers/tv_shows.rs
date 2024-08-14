@@ -19,16 +19,14 @@ pub async fn download_tv_show(
 /// Handler for `GET /api/v1/channels/:channel_name/tv_shows/:tv_show_id`
 pub async fn get_tv_show_metadata(
   RpcClient(rpc_client): RpcClient,
-  Path(channel_name): Path<String>,
-  Path(tv_show_id): Path<String>,
+  Path((channel, tv_show_id)): Path<(String, String)>,
 ) -> crate::Result<Json<TVShowMetadata>> {
   let mut media_client = rpc_client.media.clone();
 
   let res = media_client
     .get_tv_show_metadata(GetTVShowMetadataRequest {
-      channel: channel_name,
+      channel,
       tv_show_id,
-      tv_show_season_number: 1,
     })
     .await?
     .into_inner();

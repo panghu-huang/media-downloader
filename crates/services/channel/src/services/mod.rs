@@ -6,7 +6,6 @@ use std::path::PathBuf;
 
 pub struct DownloadTVShowOptions {
   pub tv_show_id: String,
-  pub tv_show_season_number: u32,
   pub tv_show_episode_number: u32,
   pub destination_path: PathBuf,
 }
@@ -18,9 +17,5 @@ pub trait MediaChannelExt: Send + Sync {
     &self,
     options: DownloadTVShowOptions,
   ) -> anyhow::Result<DownloadProgressReceiver>;
-  async fn get_tv_show_metadata(
-    &self,
-    tv_show_id: &str,
-    tv_show_season_number: u32,
-  ) -> anyhow::Result<TVShowMetadata>;
+  async fn get_tv_show_metadata(&self, tv_show_id: &str) -> anyhow::Result<TVShowMetadata>;
 }

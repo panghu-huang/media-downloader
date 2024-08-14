@@ -1321,6 +1321,8 @@ dependencies = [
  "testing",
  "tokio",
  "tower",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

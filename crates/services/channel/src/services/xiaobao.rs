@@ -11,6 +11,7 @@ use scraper::{Html, Selector};
 const REQUEST_USER_AGENT: &str = 
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
 
+#[derive(Debug)]
 pub struct SimpleTVShowMetadata {
   name: String,
   year: u32,
@@ -35,7 +36,6 @@ impl MediaChannelExt for XiaobaoTV {
     let html = self
       .fetch_tv_show_web_page_html(
         &options.tv_show_id,
-        options.tv_show_season_number,
         options.tv_show_episode_number,
       )
       .await?;
@@ -55,9 +55,9 @@ impl MediaChannelExt for XiaobaoTV {
   async fn get_tv_show_metadata(
     &self,
     tv_show_id: &str,
-    tv_show_season_number: u32,
   ) -> anyhow::Result<TVShowMetadata> {
-    let web_page_url = self.tv_show_web_page_url(tv_show_id, tv_show_season_number, 1);
+    log::info!("Getting TV show metadata of {}", tv_show_id);
+    let web_page_url = self.tv_show_web_page_url(tv_show_id, 1);
 
     let html = self.fetch_web_page_html(&web_page_url).await?;
 
@@ -65,12 +65,15 @@ impl MediaChannelExt for XiaobaoTV {
 
     let simple_metadata = self.extract_tv_show_metadata_from_web_page(&html).await?;
 
+    log::info!("TV show metadata of {}: {:#?}", tv_show_id, simple_metadata);
+
     Ok(TVShowMetadata {
       channel: self.channel_name().to_owned(),
       id: tv_show_id.to_owned(),
       name: simple_metadata.name,
       year: simple_metadata.year,
-      season_number: tv_show_season_number,
+      // TODO: implement
+      season_number: 1,
       source_page_url: web_page_url,
       source_download_url: download_url,
       total_episodes: simple_metadata.total_episodes,
@@ -100,11 +103,10 @@ impl XiaobaoTV {
   async fn fetch_tv_show_web_page_html(
     &self,
     tv_show_id: &str,
-    tv_show_season_number: u32,
     tv_show_episode_number: u32,
   ) -> anyhow::Result<String> {
     let web_page_url =
-      self.tv_show_web_page_url(tv_show_id, tv_show_season_number, tv_show_episode_number);
+      self.tv_show_web_page_url(tv_show_id, tv_show_episode_number);
 
     self.fetch_web_page_html(&web_page_url).await
   }
@@ -133,12 +135,11 @@ impl XiaobaoTV {
   fn tv_show_web_page_url(
     &self,
     tv_show_id: &str,
-    tv_show_season_number: u32,
     tv_show_episode_number: u32,
   ) -> String {
     format!(
-      "https://{}/index.php/vod/play/id/{}/sid/{}/nid/{}.html",
-      self.host, tv_show_id, tv_show_season_number, tv_show_episode_number,
+      "https://{}/index.php/vod/play/id/{}/sid/1/nid/{}.html",
+      self.host, tv_show_id, tv_show_episode_number,
     )
   }
 }
@@ -178,7 +179,6 @@ mod tests {
   #[tokio::test]
   async fn test_download_tv_show() {
     let tv_show_id = 548.to_string();
-    let tv_show_season_number = 1;
     let tv_show_episode_number = 1;
 
     let xiaobaotv = XiaobaoTV::new("xiaoxintv.com");
@@ -190,7 +190,6 @@ mod tests {
 
     let download_opts = DownloadTVShowOptions {
       tv_show_id: tv_show_id.clone(),
-      tv_show_season_number,
       tv_show_episode_number,
       destination_path,
     };

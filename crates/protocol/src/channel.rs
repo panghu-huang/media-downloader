@@ -5,7 +5,6 @@ use std::path::PathBuf;
 pub struct DownloadTVShowRequest {
   pub channel: String,
   pub tv_show_id: String,
-  pub tv_show_season_number: u32,
   pub tv_show_episode_number: u32,
 }
 
@@ -18,7 +17,6 @@ pub struct DownloadTVShowResponse {
 pub struct GetTVShowMetadataRequest {
   pub channel: String,
   pub tv_show_id: String,
-  pub tv_show_season_number: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

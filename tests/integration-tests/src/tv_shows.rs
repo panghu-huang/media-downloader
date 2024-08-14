@@ -1,5 +1,6 @@
 use crate::common::setup_testing;
 use crate::response_to_json;
+use axum::http::StatusCode;
 use protocol::channel::TVShowMetadata;
 use testing::request::Request;
 
@@ -14,6 +15,7 @@ async fn test_get_tv_show_metadata() -> anyhow::Result<()> {
 
   let response = Request::get(&url).send(&app).await?;
 
+  assert_eq!(response.status(), StatusCode::OK);
   let response: TVShowMetadata = response_to_json!(response);
 
   assert_eq!(response.id, tv_show_id.to_string());

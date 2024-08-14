@@ -16,9 +16,8 @@ impl MediaExt for MediaService {
   ) -> tonic::Result<Response<protocol::Empty>> {
     let request = request.into_inner();
     log::info!(
-      "Downloading TV show {} (S{}E{})",
+      "Downloading TV show {} (E{})",
       request.tv_show_id,
-      request.tv_show_season_number,
       request.tv_show_episode_number
     );
 
@@ -39,9 +38,8 @@ impl MediaExt for MediaService {
         }
         Err(err) => {
           log::info!(
-            "Failed to download TV show {}(S{}E{}): {}",
+            "Failed to download TV show {}(E{}): {}",
             request.tv_show_id,
-            request.tv_show_season_number,
             request.tv_show_episode_number,
             err,
           );

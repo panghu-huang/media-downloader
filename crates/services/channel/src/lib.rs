@@ -28,20 +28,18 @@ impl ChannelExt for ChannelService {
   ) -> tonic::Result<Response<Self::DownloadTvShowStream>> {
     let request = request.into_inner();
     log::info!(
-      "Downloading TV show {} (S{}E{})",
+      "Downloading TV show {} (E{})",
       request.tv_show_id,
-      request.tv_show_season_number,
       request.tv_show_episode_number
     );
 
     let file_name = format!(
-      "{}-{}-{}.mp4",
-      request.tv_show_id, request.tv_show_season_number, request.tv_show_episode_number
+      "{}-{}.mp4",
+      request.tv_show_id, request.tv_show_episode_number
     );
 
     let options = DownloadTVShowOptions {
       tv_show_id: request.tv_show_id,
-      tv_show_season_number: request.tv_show_season_number,
       tv_show_episode_number: request.tv_show_episode_number,
       destination_path: self.destination_dir.join(file_name),
     };
@@ -61,11 +59,12 @@ impl ChannelExt for ChannelService {
     request: Request<GetTVShowMetadataRequest>,
   ) -> tonic::Result<Response<TVShowMetadata>> {
     let request = request.into_inner();
+    log::info!("Getting TV show metadata of {}", request.tv_show_id);
 
     let channel = self.get_channel_by_name(&request.channel)?;
 
     let metadata = channel
-      .get_tv_show_metadata(&request.tv_show_id, request.tv_show_season_number)
+      .get_tv_show_metadata(&request.tv_show_id)
       .await
       .map_err(|e| Status::internal(format!("Failed to get TV show metadata: {}", e)))?;
 
