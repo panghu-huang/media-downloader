@@ -1,5 +1,6 @@
 use config::{Config, ConfigError, Environment as ConfigEnvironment, File};
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::env;
 use std::path::PathBuf;
 
@@ -29,6 +30,11 @@ pub struct XiaobaoTVConfig {
 }
 
 #[derive(Deserialize, Clone)]
+pub struct UnifiedItemConfig {
+  pub base_url: String,
+}
+
+#[derive(Deserialize, Clone)]
 pub struct DatabaseConfig {
   pub url: String,
 }
@@ -39,6 +45,8 @@ pub struct UserConfiguration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
   pub channels: MediaChannelConfig,
+  #[serde(rename = "unified-channels")]
+  pub unified_channels: HashMap<String, UnifiedItemConfig>,
 }
 
 // Configuration is a structure composed of user configuration and environment configuration.
@@ -48,6 +56,7 @@ pub struct Configuration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
   pub channels: MediaChannelConfig,
+  pub unified_channels: HashMap<String, UnifiedItemConfig>,
 }
 
 impl Configuration {
@@ -87,6 +96,7 @@ impl Configuration {
       app: user_config.app,
       database: user_config.database,
       channels: user_config.channels,
+      unified_channels: user_config.unified_channels,
     })
   }
 }

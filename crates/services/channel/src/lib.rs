@@ -85,14 +85,29 @@ impl ChannelService {
 
 impl ChannelService {
   pub fn new(config: &Configuration) -> Self {
-    let xiaobao = services::xiaobao::XiaobaoTV::new(&config.channels.xiaobao.host);
+    use self::services::unified::UnifiedMediaService;
+    use self::services::xiaobao::XiaobaoTV;
 
-    let channels = [(
+    let xiaobao = XiaobaoTV::new(&config.channels.xiaobao.host);
+
+    let mut channels: HashMap<String, Box<dyn MediaChannelExt>> = [(
       xiaobao.channel_name().to_owned(),
       Box::new(xiaobao) as Box<dyn MediaChannelExt>,
     )]
     .into_iter()
     .collect();
+
+    for (channel_name, config) in &config.unified_channels {
+      let unified_channel = UnifiedMediaService::new(channel_name, &config.base_url);
+
+      log::info!(
+        "Adding new unified channel {} with base URL {} ... ",
+        channel_name,
+        config.base_url,
+      );
+
+      channels.insert(channel_name.to_string(), Box::new(unified_channel));
+    }
 
     Self {
       channels,

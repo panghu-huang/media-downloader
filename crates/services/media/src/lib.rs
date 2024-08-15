@@ -35,6 +35,8 @@ impl MediaExt for MediaService {
           while let Some(evt) = progress.message().await.unwrap() {
             log::info!("Event {:#?}", evt);
           }
+
+          log::info!("Done");
         }
         Err(err) => {
           log::info!(

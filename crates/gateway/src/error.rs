@@ -83,7 +83,12 @@ impl From<tonic::Status> for AppError {
       tonic::Code::InvalidArgument => AppError::bad_request(status.message()),
       tonic::Code::PermissionDenied => AppError::forbidden(),
       tonic::Code::Unauthenticated => AppError::unauthorized(status.message()),
-      code => AppError::internal_server_error(format!("{}", code)),
+      code => {
+        log::error!("Code: {}", code);
+        log::error!("Message {}", status.message());
+
+        AppError::internal_server_error(format!("{}", code))
+      }
     }
   }
 }

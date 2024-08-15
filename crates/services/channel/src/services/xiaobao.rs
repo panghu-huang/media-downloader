@@ -61,8 +61,6 @@ impl MediaChannelExt for XiaobaoTV {
 
     let html = self.fetch_web_page_html(&web_page_url).await?;
 
-    let download_url = self.extract_download_url_from_web_page_html(&html).await?;
-
     let simple_metadata = self.extract_tv_show_metadata_from_web_page(&html).await?;
 
     log::info!("TV show metadata of {}: {:#?}", tv_show_id, simple_metadata);
@@ -72,10 +70,6 @@ impl MediaChannelExt for XiaobaoTV {
       id: tv_show_id.to_owned(),
       name: simple_metadata.name,
       year: simple_metadata.year,
-      // TODO: implement
-      season_number: 1,
-      source_page_url: web_page_url,
-      source_download_url: download_url,
       total_episodes: simple_metadata.total_episodes,
     })
   }

@@ -1,3 +1,4 @@
+pub mod unified;
 pub mod xiaobao;
 
 use protocol::channel::TVShowMetadata;

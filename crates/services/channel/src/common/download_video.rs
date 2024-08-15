@@ -33,38 +33,65 @@ pub async fn download_video(
     let destination_path = options.destination_path.to_path_buf();
 
     async move {
-      log::info!("Downloading segments of playlist ... ");
-      let updated_playlist =
-        download_segments_of_playlist(playlist, parallel_size, &download_progress_stream).await?;
+      if let Err(err) = download_and_transform(
+        playlist,
+        &download_progress_stream,
+        parallel_size,
+        destination_path,
+      )
+      .await
+      {
+        log::error!("Failed download video: {}", err);
+        download_progress_stream.done();
 
-      log::info!("Writing to file system ... ");
-
-      let mut bytes: Vec<u8> = Vec::new();
-
-      updated_playlist.write_to(&mut bytes)?;
-
-      let destination_file_name = destination_path.file_name().unwrap();
-
-      let m3u8_file_name = format!("{}.m3u8", destination_file_name.to_str().unwrap());
-      let m3u8_path = temporary_directory().await?.join(m3u8_file_name);
-
-      fs::write(&m3u8_path, bytes).await?;
-
-      download_progress_stream.in_progress("Transforming video ... ");
-
-      log::info!("Transforming video ... ");
-
-      fs::create_dir_all(destination_path.parent().unwrap()).await?;
-
-      transform_video(&m3u8_path, &destination_path).await?;
-
-      download_progress_stream.done();
+        anyhow::bail!(err)
+      }
 
       Ok(()) as anyhow::Result<()>
     }
   });
 
   Ok(receiver)
+}
+
+async fn download_and_transform(
+  playlist: MediaPlaylist,
+  download_progress_stream: &DownloadProgressStream,
+  parallel_size: usize,
+  destination_path: PathBuf,
+) -> anyhow::Result<()> {
+  log::info!("Downloading segments ... ");
+  let updated_playlist =
+    download_segments_of_playlist(playlist, parallel_size, download_progress_stream)
+      .await
+      .map_err(|e| anyhow::anyhow!("Download segments failed: {}", e))?;
+
+  log::info!("Writing to file system ... ");
+
+  let mut bytes: Vec<u8> = Vec::new();
+
+  updated_playlist.write_to(&mut bytes)?;
+
+  let destination_file_name = destination_path.file_name().unwrap();
+
+  let m3u8_file_name = format!("{}.m3u8", destination_file_name.to_str().unwrap());
+  let m3u8_path = temporary_directory().await?.join(m3u8_file_name);
+
+  fs::write(&m3u8_path, bytes).await?;
+
+  download_progress_stream.in_progress("Transforming video ... ");
+
+  log::info!("Transforming video ... ");
+
+  fs::create_dir_all(destination_path.parent().unwrap()).await?;
+
+  if let Err(err) = transform_video(&m3u8_path, &destination_path).await {
+    log::error!("Failed to tranform video: {}", err);
+  }
+
+  download_progress_stream.done();
+
+  Ok(()) as anyhow::Result<()>
 }
 
 async fn download_segments_of_playlist(
@@ -76,7 +103,7 @@ async fn download_segments_of_playlist(
 
   let mut handles = vec![];
 
-  for segment in &playlist.segments {
+  for (idx, segment) in playlist.segments.iter().enumerate() {
     let semaphore = semaphore.clone();
 
     let handle = tokio::spawn({
@@ -88,7 +115,7 @@ async fn download_segments_of_playlist(
 
         let downloaded_path = download_media_segment(&uri).await?;
 
-        stream.in_progress("Segment downloaded: {}");
+        stream.in_progress(&format!("Segment downloaded: {}", idx));
 
         // Wait 2s for avoid 429 error
         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
@@ -105,7 +132,9 @@ async fn download_segments_of_playlist(
   for idx in 0..total {
     let handle = handles.get_mut(idx).unwrap();
 
-    let downloaded_path = handle.await??;
+    let downloaded_path = handle
+      .await
+      .map_err(|e| anyhow::anyhow!("Error occurred during download segment '{}': {}", idx, e))??;
 
     playlist.segments.get_mut(idx).unwrap().uri = downloaded_path.to_string_lossy().to_string();
   }
@@ -147,7 +176,9 @@ async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
 
   let status = res.status();
   if !status.is_success() {
-    log::info!("{:#?}", res.headers());
+    log::error!("Request failed with code {}", status);
+    log::error!("{:#?}", res.headers());
+
     anyhow::bail!("Request failed with code {}", status);
   }
 

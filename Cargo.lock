@@ -379,6 +379,8 @@ dependencies = [
  "regex",
  "reqwest",
  "scraper",
+ "serde",
+ "serde_json",
  "stream",
  "tokio",
  "tokio-stream",

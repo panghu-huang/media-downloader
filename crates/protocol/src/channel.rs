@@ -25,10 +25,7 @@ pub struct TVShowMetadata {
   pub id: String,
   pub name: String,
   pub year: u32,
-  pub season_number: u32,
   pub total_episodes: u32,
-  pub source_page_url: String,
-  pub source_download_url: String,
 }
 
 mod channel_inner {
