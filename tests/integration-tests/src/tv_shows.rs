@@ -26,13 +26,14 @@ async fn test_get_tv_show_metadata() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn test_get_tv_show_metadata_by_unified_channel() -> anyhow::Result<()> {
+async fn test_get_tv_show_metadata_by_huaweiba() -> anyhow::Result<()> {
+  let channel_name = "huaweiba";
   let tv_show_id = 9104;
   let gateway = setup_testing().await;
 
   let app = gateway.router();
 
-  let url = format!("/api/v1/channels/huaweiba/tv_shows/{}", tv_show_id);
+  let url = format!("/api/v1/channels/{}/tv_shows/{}", channel_name, tv_show_id);
 
   let response = Request::get(&url).send(&app).await?;
 
@@ -47,22 +48,23 @@ async fn test_get_tv_show_metadata_by_unified_channel() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn test_download_tv_show_by_unified_channel() -> anyhow::Result<()> {
-  let tv_show_id = 9104;
+async fn test_get_tv_show_metadata_by_heimuer() -> anyhow::Result<()> {
+  let channel_name = "heimuer";
+  let tv_show_id = 24405;
   let gateway = setup_testing().await;
 
   let app = gateway.router();
 
-  let response = Request::post("/api/v1/tv_shows/download")
-    .body(serde_json::json!({
-      "channel": "huaweiba",
-      "tv_show_id": tv_show_id.to_string(),
-      "tv_show_episode_number": 1,
-    }))
-    .send(&app)
-    .await?;
+  let url = format!("/api/v1/channels/{}/tv_shows/{}", channel_name, tv_show_id);
 
-  assert_eq!(response.status(), StatusCode::CREATED);
+  let response = Request::get(&url).send(&app).await?;
+
+  assert_eq!(response.status(), StatusCode::OK);
+  let response: TVShowMetadata = response_to_json!(response);
+
+  assert_eq!(response.id, tv_show_id.to_string());
+  assert_eq!(response.name, "海贼王");
+  assert_eq!(response.year, 1999);
 
   Ok(())
 }

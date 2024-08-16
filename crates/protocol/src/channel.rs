@@ -26,6 +26,7 @@ pub struct TVShowMetadata {
   pub name: String,
   pub year: u32,
   pub total_episodes: u32,
+  pub description: String,
 }
 
 mod channel_inner {

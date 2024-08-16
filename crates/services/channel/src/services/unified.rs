@@ -65,9 +65,10 @@ impl MediaChannelExt for UnifiedMediaService {
     Ok(TVShowMetadata {
       channel: self.channel_name.clone(),
       id: detail.id.to_string(),
-      name: detail.name.clone(),
+      name: detail.name,
       year,
       total_episodes: total_episodes.try_into()?,
+      description: detail.description,
     })
   }
 }

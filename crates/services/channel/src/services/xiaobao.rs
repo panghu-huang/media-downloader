@@ -71,6 +71,7 @@ impl MediaChannelExt for XiaobaoTV {
       name: simple_metadata.name,
       year: simple_metadata.year,
       total_episodes: simple_metadata.total_episodes,
+      description: String::new(),
     })
   }
 }
