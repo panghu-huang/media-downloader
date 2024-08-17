@@ -2,30 +2,29 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DownloadTVShowRequest {
+pub struct DownloadMediaRequest {
   pub channel: String,
-  pub tv_show_id: String,
-  pub tv_show_episode_number: u32,
+  pub media_id: String,
+  pub number: Option<u32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DownloadTVShowResponse {
+pub struct DownloadMediaResponse {
   pub destination_path: PathBuf,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GetTVShowMetadataRequest {
+pub struct GetMediaMetadataRequest {
   pub channel: String,
-  pub tv_show_id: String,
+  pub media_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TVShowMetadata {
+pub struct MediaMetadata {
   pub channel: String,
   pub id: String,
   pub name: String,
-  pub year: u32,
-  pub total_episodes: u32,
+  pub release_year: u32,
   pub description: String,
 }
 

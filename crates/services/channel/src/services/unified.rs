@@ -1,10 +1,9 @@
 mod api;
 
 use self::api::{Detail, UnifiedAPI};
-use crate::common::{download_video, DownloadVideoOptions};
-use crate::services::DownloadTVShowOptions;
+use crate::services::DownloadMediaOptions;
 use crate::services::MediaChannelExt;
-use protocol::channel::TVShowMetadata;
+use protocol::channel::MediaMetadata;
 use protocol::DownloadProgressReceiver;
 
 pub struct UnifiedMediaService {
@@ -18,63 +17,61 @@ impl MediaChannelExt for UnifiedMediaService {
     Box::leak(Box::new(self.channel_name.clone()))
   }
 
-  async fn download_tv_show(
+  async fn download_media(
     &self,
-    options: DownloadTVShowOptions,
+    options: DownloadMediaOptions,
   ) -> anyhow::Result<DownloadProgressReceiver> {
-    let detail = self.get_video_detail(&options.tv_show_id).await?;
+    let detail = self.get_media_detail(&options.media_id).await?;
 
     let mut play_url_list = detail.play_url.split('#');
 
-    let episode: usize = options.tv_show_episode_number.try_into()?;
+    let number: usize = options.number.unwrap_or(1).try_into()?;
 
-    let url_of_episode = play_url_list.nth(episode - 1).ok_or_else(|| {
+    let url_of_number = play_url_list.nth(number - 1).ok_or_else(|| {
       anyhow::anyhow!(
-        "Invalid episode number {} of TV show {}",
-        options.tv_show_episode_number,
-        options.tv_show_id
+        "Invalid number {:?} of media {}",
+        options.number,
+        options.media_id
       )
     })?;
 
-    let m3u8_url = url_of_episode.split('$').nth(1).ok_or_else(|| {
+    let m3u8_url = url_of_number.split('$').nth(1).ok_or_else(|| {
       anyhow::anyhow!(
-        "Invalid url format found: {} ({}#{})",
-        url_of_episode,
-        options.tv_show_id,
-        options.tv_show_episode_number
+        "Invalid url format found: {} ({}#{:?})",
+        url_of_number,
+        options.media_id,
+        options.number,
       )
     })?;
 
-    let progress = download_video(DownloadVideoOptions {
+    let download_opts = crate::common::DownloadMediaOptions {
       download_url: m3u8_url,
       destination_path: &options.destination_path,
       parallel_size: 10,
-    })
-    .await?;
+    };
+
+    let progress = crate::common::download_media(download_opts).await?;
 
     Ok(progress)
   }
 
-  async fn get_tv_show_metadata(&self, tv_show_id: &str) -> anyhow::Result<TVShowMetadata> {
-    let detail = self.get_video_detail(tv_show_id).await?;
+  async fn get_media_metadata(&self, media_id: &str) -> anyhow::Result<MediaMetadata> {
+    let detail = self.get_media_detail(media_id).await?;
 
-    let total_episodes = detail.play_url.split('#').count();
+    let release_year = detail.year.parse().unwrap_or(0);
 
-    let year = detail.year.parse().unwrap_or(0);
-
-    Ok(TVShowMetadata {
+    Ok(MediaMetadata {
       channel: self.channel_name.clone(),
       id: detail.id.to_string(),
       name: detail.name,
-      year,
-      total_episodes: total_episodes.try_into()?,
+      release_year,
       description: detail.description,
     })
   }
 }
 
 impl UnifiedMediaService {
-  async fn get_video_detail(&self, id: &str) -> anyhow::Result<Detail> {
+  async fn get_media_detail(&self, id: &str) -> anyhow::Result<Detail> {
     log::info!("Getting video detail of {}", id);
 
     let details = self.api.get_details(&[id]).await?;

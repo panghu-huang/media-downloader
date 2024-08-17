@@ -1,1 +1,1 @@
-pub mod tv_shows;
+pub mod media;

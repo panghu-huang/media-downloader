@@ -42,7 +42,6 @@ tower-http = "0.5.2"
 async-trait = "0.1.81"
 reqwest = { version = "0.12.5", features = ["http2", "rustls-tls", "gzip"] }
 http = "1.1.0"
-scraper = "0.20.0"
 regex = "1.10.6"
 m3u8-rs = "6.0.0"
 url = "2.5.2"

@@ -10,14 +10,14 @@ use tokio::fs;
 use tokio::sync::Semaphore;
 use url::Url;
 
-pub struct DownloadVideoOptions<'a> {
+pub struct DownloadMediaOptions<'a> {
   pub download_url: &'a str,
   pub destination_path: &'a Path,
   pub parallel_size: usize,
 }
 
-pub async fn download_video(
-  options: DownloadVideoOptions<'_>,
+pub async fn download_media(
+  options: DownloadMediaOptions<'_>,
 ) -> anyhow::Result<DownloadProgressReceiver> {
   let playlist = fetch_media_playlist(options.download_url).await?;
 

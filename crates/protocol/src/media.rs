@@ -1,8 +1,8 @@
-pub type DownloadTVShowRequest = crate::channel::DownloadTVShowRequest;
+pub type DownloadMediaRequest = crate::channel::DownloadMediaRequest;
 
-pub type GetTVShowMetadataRequest = crate::channel::GetTVShowMetadataRequest;
+pub type GetMediaMetadataRequest = crate::channel::GetMediaMetadataRequest;
 
-pub type TVShowMetadata = crate::channel::TVShowMetadata;
+pub type MediaMetadata = crate::channel::MediaMetadata;
 
 mod media_inner {
   include!("./pb/media.Media.rs");

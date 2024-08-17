@@ -1,6 +1,6 @@
-use protocol::media::DownloadTVShowRequest;
+use protocol::media::DownloadMediaRequest;
 use protocol::media::MediaExt;
-use protocol::media::{GetTVShowMetadataRequest, TVShowMetadata};
+use protocol::media::{GetMediaMetadataRequest, MediaMetadata};
 use protocol::tonic::{self, async_trait, Request, Response};
 use rpc_client::RpcClient;
 
@@ -10,21 +10,21 @@ pub struct MediaService {
 
 #[async_trait]
 impl MediaExt for MediaService {
-  async fn download_tv_show(
+  async fn download_media(
     &self,
-    request: Request<DownloadTVShowRequest>,
+    request: Request<DownloadMediaRequest>,
   ) -> tonic::Result<Response<protocol::Empty>> {
     let request = request.into_inner();
     log::info!(
-      "Downloading TV show {} (E{})",
-      request.tv_show_id,
-      request.tv_show_episode_number
+      "Downloading media {} (#{:?})",
+      request.media_id,
+      request.number
     );
 
     let mut channel_client = self.rpc_client.channel.clone();
 
     tokio::spawn(async move {
-      let res = channel_client.download_tv_show(request.clone()).await;
+      let res = channel_client.download_media(request.clone()).await;
 
       match res {
         Ok(res) => {
@@ -40,9 +40,9 @@ impl MediaExt for MediaService {
         }
         Err(err) => {
           log::info!(
-            "Failed to download TV show {}(E{}): {}",
-            request.tv_show_id,
-            request.tv_show_episode_number,
+            "Failed to download media {}(#{:?}): {}",
+            request.media_id,
+            request.number,
             err,
           );
         }
@@ -52,16 +52,16 @@ impl MediaExt for MediaService {
     Ok(Response::new(protocol::Empty {}))
   }
 
-  async fn get_tv_show_metadata(
+  async fn get_media_metadata(
     &self,
-    request: Request<GetTVShowMetadataRequest>,
-  ) -> tonic::Result<Response<TVShowMetadata>> {
+    request: Request<GetMediaMetadataRequest>,
+  ) -> tonic::Result<Response<MediaMetadata>> {
     let request = request.into_inner();
 
     let mut channel_client = self.rpc_client.channel.clone();
 
     let res = channel_client
-      .get_tv_show_metadata(request.clone())
+      .get_media_metadata(request.clone())
       .await?
       .into_inner();
 

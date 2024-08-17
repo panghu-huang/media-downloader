@@ -14,7 +14,6 @@ async-trait = { workspace = true }
 anyhow = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 http = { workspace = true }
-scraper = { workspace = true }
 tokio = { workspace = true, features = ["macros"] }
 regex = { workspace = true }
 m3u8-rs = { workspace = true }

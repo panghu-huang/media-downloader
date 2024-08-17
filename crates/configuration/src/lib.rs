@@ -20,16 +20,6 @@ pub struct AppConfiguration {
 }
 
 #[derive(Deserialize, Clone)]
-pub struct MediaChannelConfig {
-  pub xiaobao: XiaobaoTVConfig,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct XiaobaoTVConfig {
-  pub host: String,
-}
-
-#[derive(Deserialize, Clone)]
 pub struct UnifiedItemConfig {
   pub base_url: String,
 }
@@ -44,7 +34,6 @@ pub struct DatabaseConfig {
 pub struct UserConfiguration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
-  pub channels: MediaChannelConfig,
   #[serde(rename = "unified-channels")]
   pub unified_channels: HashMap<String, UnifiedItemConfig>,
 }
@@ -55,7 +44,6 @@ pub struct Configuration {
   pub environment: Environment,
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
-  pub channels: MediaChannelConfig,
   pub unified_channels: HashMap<String, UnifiedItemConfig>,
 }
 
@@ -95,7 +83,6 @@ impl Configuration {
       environment: env,
       app: user_config.app,
       database: user_config.database,
-      channels: user_config.channels,
       unified_channels: user_config.unified_channels,
     })
   }

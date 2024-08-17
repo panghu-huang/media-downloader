@@ -83,9 +83,9 @@ pub mod media_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        pub async fn download_tv_show(
+        pub async fn download_media(
             &mut self,
-            request: impl tonic::IntoRequest<crate::media::DownloadTVShowRequest>,
+            request: impl tonic::IntoRequest<crate::media::DownloadMediaRequest>,
         ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status> {
             self.inner
                 .ready()
@@ -98,18 +98,17 @@ pub mod media_client {
                 })?;
             let codec = crate::json_codec::JsonCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/media.Media/DownloadTvShow",
+                "/media.Media/DownloadMedia",
             );
             let mut req = request.into_request();
-            req.extensions_mut()
-                .insert(GrpcMethod::new("media.Media", "DownloadTvShow"));
+            req.extensions_mut().insert(GrpcMethod::new("media.Media", "DownloadMedia"));
             self.inner.unary(req, path, codec).await
         }
-        pub async fn get_tv_show_metadata(
+        pub async fn get_media_metadata(
             &mut self,
-            request: impl tonic::IntoRequest<crate::media::GetTVShowMetadataRequest>,
+            request: impl tonic::IntoRequest<crate::media::GetMediaMetadataRequest>,
         ) -> std::result::Result<
-            tonic::Response<crate::media::TVShowMetadata>,
+            tonic::Response<crate::media::MediaMetadata>,
             tonic::Status,
         > {
             self.inner
@@ -123,11 +122,11 @@ pub mod media_client {
                 })?;
             let codec = crate::json_codec::JsonCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/media.Media/GetTvShowMetadata",
+                "/media.Media/GetMediaMetadata",
             );
             let mut req = request.into_request();
             req.extensions_mut()
-                .insert(GrpcMethod::new("media.Media", "GetTvShowMetadata"));
+                .insert(GrpcMethod::new("media.Media", "GetMediaMetadata"));
             self.inner.unary(req, path, codec).await
         }
     }
@@ -139,15 +138,15 @@ pub mod media_server {
     /// Generated trait containing gRPC methods that should be implemented for use with MediaServer.
     #[async_trait]
     pub trait Media: Send + Sync + 'static {
-        async fn download_tv_show(
+        async fn download_media(
             &self,
-            request: tonic::Request<crate::media::DownloadTVShowRequest>,
+            request: tonic::Request<crate::media::DownloadMediaRequest>,
         ) -> std::result::Result<tonic::Response<crate::Empty>, tonic::Status>;
-        async fn get_tv_show_metadata(
+        async fn get_media_metadata(
             &self,
-            request: tonic::Request<crate::media::GetTVShowMetadataRequest>,
+            request: tonic::Request<crate::media::GetMediaMetadataRequest>,
         ) -> std::result::Result<
-            tonic::Response<crate::media::TVShowMetadata>,
+            tonic::Response<crate::media::MediaMetadata>,
             tonic::Status,
         >;
     }
@@ -230,13 +229,13 @@ pub mod media_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/media.Media/DownloadTvShow" => {
+                "/media.Media/DownloadMedia" => {
                     #[allow(non_camel_case_types)]
-                    struct DownloadTvShowSvc<T: Media>(pub Arc<T>);
+                    struct DownloadMediaSvc<T: Media>(pub Arc<T>);
                     impl<
                         T: Media,
-                    > tonic::server::UnaryService<crate::media::DownloadTVShowRequest>
-                    for DownloadTvShowSvc<T> {
+                    > tonic::server::UnaryService<crate::media::DownloadMediaRequest>
+                    for DownloadMediaSvc<T> {
                         type Response = crate::Empty;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -244,11 +243,11 @@ pub mod media_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<crate::media::DownloadTVShowRequest>,
+                            request: tonic::Request<crate::media::DownloadMediaRequest>,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Media>::download_tv_show(&inner, request).await
+                                <T as Media>::download_media(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -260,7 +259,7 @@ pub mod media_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = DownloadTvShowSvc(inner);
+                        let method = DownloadMediaSvc(inner);
                         let codec = crate::json_codec::JsonCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -276,14 +275,14 @@ pub mod media_server {
                     };
                     Box::pin(fut)
                 }
-                "/media.Media/GetTvShowMetadata" => {
+                "/media.Media/GetMediaMetadata" => {
                     #[allow(non_camel_case_types)]
-                    struct GetTvShowMetadataSvc<T: Media>(pub Arc<T>);
+                    struct GetMediaMetadataSvc<T: Media>(pub Arc<T>);
                     impl<
                         T: Media,
-                    > tonic::server::UnaryService<crate::media::GetTVShowMetadataRequest>
-                    for GetTvShowMetadataSvc<T> {
-                        type Response = crate::media::TVShowMetadata;
+                    > tonic::server::UnaryService<crate::media::GetMediaMetadataRequest>
+                    for GetMediaMetadataSvc<T> {
+                        type Response = crate::media::MediaMetadata;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
@@ -291,12 +290,12 @@ pub mod media_server {
                         fn call(
                             &mut self,
                             request: tonic::Request<
-                                crate::media::GetTVShowMetadataRequest,
+                                crate::media::GetMediaMetadataRequest,
                             >,
                         ) -> Self::Future {
                             let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                <T as Media>::get_tv_show_metadata(&inner, request).await
+                                <T as Media>::get_media_metadata(&inner, request).await
                             };
                             Box::pin(fut)
                         }
@@ -308,7 +307,7 @@ pub mod media_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetTvShowMetadataSvc(inner);
+                        let method = GetMediaMetadataSvc(inner);
                         let codec = crate::json_codec::JsonCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

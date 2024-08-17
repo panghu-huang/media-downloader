@@ -1,7 +1,5 @@
-mod download_video;
+mod download_media;
 mod fs;
-mod selector;
 
-pub use download_video::*;
+pub use download_media::*;
 pub use fs::*;
-pub use selector::*;

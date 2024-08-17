@@ -10,7 +10,7 @@ use axum::http::{HeaderValue, Method};
 use axum::routing::{get, post};
 use axum::Router;
 use configuration::Configuration;
-use controllers::tv_shows;
+use controllers::media;
 use rpc_client::RpcClient;
 use state::AppState;
 use std::net::SocketAddr;
@@ -48,10 +48,10 @@ impl Gateway {
 
     let router = Router::new()
       .route(
-        "/channels/:channel_name/tv_shows/:tv_show_id",
-        get(tv_shows::get_tv_show_metadata),
+        "/channels/:channel_name/media/:media_id",
+        get(media::get_media_metadata),
       )
-      .route("/tv_shows/download", post(tv_shows::download_tv_show))
+      .route("/media/download", post(media::download_media))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))
       // Add a revision to the response headers
