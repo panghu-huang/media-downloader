@@ -11,7 +11,8 @@ members = [
   "crates/configuration",
   "crates/services/aggregation",
   "tests/integration-tests", 
-  "crates/stream",
+  "crates/stream", 
+  "crates/terminal",
 ]
 default-members = ["crates/gateway"]
 
@@ -46,6 +47,8 @@ regex = "1.10.6"
 m3u8-rs = "6.0.0"
 url = "2.5.2"
 parking_lot = "0.12.3"
+ratatui = "0.28.0"
+crossterm = "0.28.1"
 
 # Internal dependencies
 gateway = { path = "crates/gateway" }
