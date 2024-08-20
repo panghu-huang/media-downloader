@@ -2,6 +2,10 @@ pub type DownloadMediaRequest = crate::channel::DownloadMediaRequest;
 
 pub type GetMediaMetadataRequest = crate::channel::GetMediaMetadataRequest;
 
+pub type SearchMediaRequest = crate::channel::SearchMediaRequest;
+
+pub type SearchMediaResponse = crate::channel::SearchMediaResponse;
+
 pub type MediaMetadata = crate::channel::MediaMetadata;
 
 mod media_inner {

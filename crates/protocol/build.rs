@@ -8,6 +8,7 @@ fn main() {
     service Channel {
       rpc DownloadMedia(crate::channel::DownloadMediaRequest) returns (stream crate::DownloadProgressItem) {}
       rpc GetMediaMetadata(crate::channel::GetMediaMetadataRequest) returns (crate::channel::MediaMetadata) {}
+      rpc SearchMedia(crate::channel::SearchMediaRequest) returns (crate::channel::SearchMediaResponse) {}
     }
   };
 
@@ -18,6 +19,7 @@ fn main() {
     service Media {
       rpc DownloadMedia(crate::media::DownloadMediaRequest) returns (crate::Empty) {}
       rpc GetMediaMetadata(crate::media::GetMediaMetadataRequest) returns (crate::media::MediaMetadata) {}
+      rpc SearchMedia(crate::media::SearchMediaRequest) returns (crate::media::SearchMediaResponse) {}
     }
   };
 

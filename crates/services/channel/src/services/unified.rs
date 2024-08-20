@@ -4,6 +4,7 @@ use self::api::{Detail, UnifiedAPI};
 use crate::services::DownloadMediaOptions;
 use crate::services::MediaChannelExt;
 use protocol::channel::MediaMetadata;
+use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::DownloadProgressReceiver;
 
 pub struct UnifiedMediaService {
@@ -67,6 +68,27 @@ impl MediaChannelExt for UnifiedMediaService {
       release_year,
       description: detail.description,
     })
+  }
+
+  async fn search_media(
+    &self,
+    request: &SearchMediaRequest,
+  ) -> anyhow::Result<SearchMediaResponse> {
+    let search_result = self.api.search(request.keyword.as_str()).await?;
+
+    let items = search_result
+      .list
+      .iter()
+      .map(|item| protocol::channel::MediaMetadata {
+        channel: self.channel_name.clone(),
+        id: item.id.to_string(),
+        name: item.name.clone(),
+        release_year: item.year.parse().unwrap_or(0),
+        description: item.description.clone(),
+      })
+      .collect();
+
+    Ok(SearchMediaResponse { items })
   }
 }
 

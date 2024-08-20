@@ -36,6 +36,7 @@ pub struct UserConfiguration {
   pub database: DatabaseConfig,
   #[serde(rename = "unified-channels")]
   pub unified_channels: HashMap<String, UnifiedItemConfig>,
+  pub default_channel: String,
 }
 
 // Configuration is a structure composed of user configuration and environment configuration.
@@ -45,6 +46,7 @@ pub struct Configuration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
   pub unified_channels: HashMap<String, UnifiedItemConfig>,
+  pub default_channel: String,
 }
 
 impl Configuration {
@@ -84,6 +86,7 @@ impl Configuration {
       app: user_config.app,
       database: user_config.database,
       unified_channels: user_config.unified_channels,
+      default_channel: user_config.default_channel,
     })
   }
 }

@@ -37,6 +37,13 @@ pub struct Detail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListRequest {
+  pub page: u32,
+  pub keyword: Option<String>,
+  pub type_id: Option<u32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Response<T> {
   pub code: u32,
   pub msg: String,
@@ -58,6 +65,47 @@ pub struct UnifiedAPI {
 }
 
 impl UnifiedAPI {
+  pub async fn list(&self, request: &ListRequest) -> anyhow::Result<ListResponse> {
+    let client = Client::new();
+
+    let res = client
+      .get(&self.base_url)
+      .query(&[
+        ("ac", "list"),
+        ("pg", &request.page.to_string()),
+        ("wd", &request.keyword.clone().unwrap_or_default()),
+        (
+          "t",
+          &request.type_id.clone().unwrap_or_default().to_string(),
+        ),
+      ])
+      .send()
+      .await
+      .map_err(|e| anyhow::anyhow!("Failed to send request: {}", e))?;
+
+    let status = res.status();
+
+    if !status.is_success() {
+      anyhow::bail!("Request failed with status: {}", status);
+    }
+
+    let text = res
+      .text()
+      .await
+      .map_err(|e| anyhow::anyhow!("Failed to get text response: {}", e))?;
+
+    let res: ListResponse = serde_json::from_str(&text)
+      .map_err(|e| anyhow::anyhow!("Failed to decode json response: {} ({})", e, text))?;
+
+    if res.code != 1 {
+      anyhow::bail!("Request failed with response: {:#?}", res);
+    }
+
+    log::info!("Successful got response of page {}", request.page);
+
+    Ok(res)
+  }
+
   pub async fn get_details(&self, ids: &[&str]) -> anyhow::Result<DetailResponse> {
     let client = Client::new();
 

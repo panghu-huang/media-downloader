@@ -12,6 +12,7 @@ pub enum TerminalEvent {
   KeyEvent(KeyEvent),
   Frame,
   Tick,
+  Quit,
 }
 
 pub struct Terminal {
@@ -67,11 +68,11 @@ impl Terminal {
     let task = tokio::spawn({
       let sender = self.sender.clone();
       let tick_rate = self.tick_rate;
-      let frame_rate = self.frame_rate;
+      //let frame_rate = self.frame_rate;
 
       async move {
         let mut tick_interval = interval(Duration::from_millis(1000 / tick_rate as u64));
-        let mut frame_interval = interval(Duration::from_millis(1000 / frame_rate as u64));
+        //let mut frame_interval = interval(Duration::from_millis(1000 / frame_rate as u64));
         let mut event_stream = EventStream::new();
 
         loop {
@@ -79,14 +80,17 @@ impl Terminal {
             _ = tick_interval.tick() => {
               TerminalEvent::Tick
             }
-            _ = frame_interval.tick() => {
-              TerminalEvent::Frame
-            }
+            //_ = frame_interval.tick() => {
+            //  TerminalEvent::Frame
+            //}
             event = event_stream.next() => {
               match event {
                 Some(Ok(Event::Key(key_event))) => TerminalEvent::KeyEvent(key_event),
                 _ => continue,
               }
+            }
+            Ok(_) = tokio::signal::ctrl_c() => {
+              TerminalEvent::Quit
             }
           };
 

@@ -28,6 +28,21 @@ pub struct MediaMetadata {
   pub description: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SearchMediaRequest {
+  pub keyword: String,
+  pub page: u32,
+  pub page_size: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SearchMediaResponse {
+  pub items: Vec<MediaMetadata>,
+  pub total: u32,
+  pub page: u32,
+  pub page_size: u32,
+}
+
 mod channel_inner {
   include!("./pb/channel.Channel.rs");
 }

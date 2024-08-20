@@ -5,6 +5,7 @@ use configuration::Configuration;
 use protocol::channel::ChannelExt;
 use protocol::channel::DownloadMediaRequest;
 use protocol::channel::{GetMediaMetadataRequest, MediaMetadata};
+use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::tonic;
 use protocol::tonic::{async_trait, Request, Response, Status};
 use protocol::DownloadProgressReceiver;
@@ -16,6 +17,7 @@ use std::path::PathBuf;
 pub struct ChannelService {
   destination_dir: PathBuf,
   channels: HashMap<String, Box<dyn MediaChannelExt>>,
+  default_channel: String,
 }
 
 #[async_trait]
@@ -46,7 +48,7 @@ impl ChannelExt for ChannelService {
     let download_progress_receiver = channel
       .download_media(options)
       .await
-      .map_err(|e| Status::internal(format!("Error occurred during download TV show: {}", e)))?;
+      .map_err(|e| Status::internal(format!("Error occurred during download media: {}", e)))?;
 
     Ok(Response::new(download_progress_receiver))
   }
@@ -56,16 +58,33 @@ impl ChannelExt for ChannelService {
     request: Request<GetMediaMetadataRequest>,
   ) -> tonic::Result<Response<MediaMetadata>> {
     let request = request.into_inner();
-    log::info!("Getting TV show metadata of {}", request.media_id);
+    log::info!("Getting media metadata of {}", request.media_id);
 
     let channel = self.get_channel_by_name(&request.channel)?;
 
     let metadata = channel
       .get_media_metadata(&request.media_id)
       .await
-      .map_err(|e| Status::internal(format!("Failed to get TV show metadata: {}", e)))?;
+      .map_err(|e| Status::internal(format!("Failed to get media metadata: {}", e)))?;
 
     Ok(Response::new(metadata))
+  }
+
+  async fn search_media(
+    &self,
+    request: Request<SearchMediaRequest>,
+  ) -> tonic::Result<Response<SearchMediaResponse>> {
+    let request = request.into_inner();
+    log::info!("Searching media metadata of {}", request.keyword);
+
+    let channel = self.get_channel_by_name(&self.default_channel)?;
+
+    let search_result = channel
+      .search_media(&request)
+      .await
+      .map_err(|e| Status::internal(format!("Failed to search media: {}", e)))?;
+
+    Ok(Response::new(search_result))
   }
 }
 
@@ -105,6 +124,7 @@ impl ChannelService {
 
     Self {
       channels,
+      default_channel: config.default_channel.clone(),
       destination_dir: destination_dir(),
     }
   }

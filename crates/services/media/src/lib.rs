@@ -1,6 +1,7 @@
 use protocol::media::DownloadMediaRequest;
 use protocol::media::MediaExt;
 use protocol::media::{GetMediaMetadataRequest, MediaMetadata};
+use protocol::media::{SearchMediaRequest, SearchMediaResponse};
 use protocol::tonic::{self, async_trait, Request, Response};
 use rpc_client::RpcClient;
 
@@ -62,6 +63,22 @@ impl MediaExt for MediaService {
 
     let res = channel_client
       .get_media_metadata(request.clone())
+      .await?
+      .into_inner();
+
+    Ok(Response::new(res))
+  }
+
+  async fn search_media(
+    &self,
+    request: Request<SearchMediaRequest>,
+  ) -> tonic::Result<Response<SearchMediaResponse>> {
+    let request = request.into_inner();
+
+    let mut channel_client = self.rpc_client.channel.clone();
+
+    let res = channel_client
+      .search_media(request.clone())
       .await?
       .into_inner();
 

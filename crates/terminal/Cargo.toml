@@ -6,6 +6,6 @@ edition = "2021"
 [dependencies]
 ratatui = { workspace = true, features = ["all-widgets"] }
 crossterm = { workspace = true, features = ["event-stream"] }
-tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread", "signal"] }
 anyhow = { workspace = true }
 tokio-stream = { workspace = true }
