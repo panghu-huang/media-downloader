@@ -1,8 +1,9 @@
 mod api;
 
-use self::api::{Detail, UnifiedAPI};
+use self::api::{Detail, ListRequest, Response as UnifiedAPIResponse, UnifiedAPI};
 use crate::services::DownloadMediaOptions;
 use crate::services::MediaChannelExt;
+use configuration::UnifiedItemConfig;
 use protocol::channel::MediaMetadata;
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::DownloadProgressReceiver;
@@ -66,6 +67,7 @@ impl MediaChannelExt for UnifiedMediaService {
       id: detail.id.to_string(),
       name: detail.name,
       release_year,
+      poster_url: detail.picture,
       description: detail.description,
     })
   }
@@ -74,43 +76,90 @@ impl MediaChannelExt for UnifiedMediaService {
     &self,
     request: &SearchMediaRequest,
   ) -> anyhow::Result<SearchMediaResponse> {
-    let search_result = self.api.search(request.keyword.as_str()).await?;
+    let request = ListRequest {
+      keyword: Some(request.keyword.clone()),
+      page: request.page,
+      type_id: None,
+    };
 
-    let items = search_result
+    log::info!("Search media with: {:#?}", request);
+
+    let search_result = self.api.list(&request).await?;
+
+    let ids = search_result
       .list
       .iter()
-      .map(|item| protocol::channel::MediaMetadata {
-        channel: self.channel_name.clone(),
-        id: item.id.to_string(),
-        name: item.name.clone(),
-        release_year: item.year.parse().unwrap_or(0),
-        description: item.description.clone(),
+      .map(|item| item.id.to_string())
+      .collect::<Vec<_>>();
+
+    let items_with_detail = self.get_media_detail_by_ids(ids.as_slice()).await?;
+
+    let items = items_with_detail
+      .list
+      .iter()
+      .map(|detail| {
+        let release_year = detail.year.parse().unwrap_or(0);
+
+        MediaMetadata {
+          channel: self.channel_name.clone(),
+          id: detail.id.to_string(),
+          name: detail.name.clone(),
+          release_year,
+          poster_url: detail.picture.clone(),
+          description: detail.description.clone(),
+        }
       })
       .collect();
 
-    Ok(SearchMediaResponse { items })
+    let page_size = search_result
+      .limit
+      .parse()
+      .map_err(|e| anyhow::anyhow!("Failed to parse limit as number: {}", e))?;
+
+    Ok(SearchMediaResponse {
+      items,
+      page_size,
+      page: search_result.page.into(),
+      total: search_result.total,
+    })
   }
 }
 
 impl UnifiedMediaService {
   async fn get_media_detail(&self, id: &str) -> anyhow::Result<Detail> {
-    log::info!("Getting video detail of {}", id);
+    log::info!("Getting video detail of {:?}", id);
 
-    let details = self.api.get_details(&[id]).await?;
-
-    if details.list.is_empty() {
-      anyhow::bail!("Invalid TV show ID: {}", id);
-    }
+    let details = self.get_media_detail_by_ids(&[id]).await?;
 
     let detail = details.list.first().unwrap();
 
     Ok(detail.clone())
   }
+
+  async fn get_media_detail_by_ids<T: AsRef<str>>(
+    &self,
+    ids: &[T],
+  ) -> anyhow::Result<UnifiedAPIResponse<Detail>> {
+    let details = self.api.get_details(ids).await?;
+
+    if details.list.is_empty() {
+      let ids = ids.iter().map(|s| s.as_ref()).collect::<Vec<_>>().join(",");
+      anyhow::bail!("Invalid media IDs: {:?}", ids);
+    }
+
+    Ok(details)
+  }
 }
 
 impl UnifiedMediaService {
-  pub fn new(channel_name: &str, base_url: &str) -> Self {
-    let api = UnifiedAPI::new(base_url);
+  pub fn new(channel_name: &str, config: &UnifiedItemConfig) -> Self {
+    let http_version = config.http_version.unwrap_or(2);
+
+    let api = if http_version == 1 {
+      UnifiedAPI::new_with_http_1(&config.base_url)
+    } else {
+      UnifiedAPI::new(&config.base_url)
+    };
 
     Self {
       channel_name: channel_name.to_owned(),

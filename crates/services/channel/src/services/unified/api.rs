@@ -2,6 +2,13 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum StringOrNumber {
+  String(String),
+  Number(u32),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TypeItem {
   pub type_id: u32,
   pub type_pid: u32,
@@ -47,7 +54,7 @@ pub struct ListRequest {
 pub struct Response<T> {
   pub code: u32,
   pub msg: String,
-  pub page: u32,
+  pub page: StringOrNumber,
   #[serde(rename = "pagecount")]
   pub page_count: u32,
   pub total: u32,
@@ -62,23 +69,28 @@ pub type DetailResponse = Response<Detail>;
 
 pub struct UnifiedAPI {
   base_url: String,
+  http_version: http::Version,
 }
+
+const REQUEST_USER_AGENT: &str = 
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
 
 impl UnifiedAPI {
   pub async fn list(&self, request: &ListRequest) -> anyhow::Result<ListResponse> {
-    let client = Client::new();
+    let client = self.request_client()?;
+
+    let query = &[
+      ("ac", "list"),
+      ("pg", &request.page.to_string()),
+      ("wd", &request.keyword.clone().unwrap_or_default()),
+      ("t", &request.type_id.unwrap_or_default().to_string()),
+    ];
 
     let res = client
       .get(&self.base_url)
-      .query(&[
-        ("ac", "list"),
-        ("pg", &request.page.to_string()),
-        ("wd", &request.keyword.clone().unwrap_or_default()),
-        (
-          "t",
-          &request.type_id.clone().unwrap_or_default().to_string(),
-        ),
-      ])
+      .query(query)
+      .header("User-Agent", REQUEST_USER_AGENT)
+      .version(self.http_version)
       .send()
       .await
       .map_err(|e| anyhow::anyhow!("Failed to send request: {}", e))?;
@@ -106,12 +118,17 @@ impl UnifiedAPI {
     Ok(res)
   }
 
-  pub async fn get_details(&self, ids: &[&str]) -> anyhow::Result<DetailResponse> {
-    let client = Client::new();
+  pub async fn get_details<T: AsRef<str>>(&self, ids: &[T]) -> anyhow::Result<DetailResponse> {
+    let client = self.request_client()?;
+
+    let ids = ids.iter().map(|s| s.as_ref()).collect::<Vec<_>>().join(",");
+    log::info!("Getting details with ids: {}", ids);
 
     let res = client
       .get(&self.base_url)
-      .query(&[("ac", "detail"), ("ids", &ids.join(","))])
+      .query(&[("ac", "detail"), ("ids", &ids)])
+      .header("User-Agent", REQUEST_USER_AGENT)
+      .version(self.http_version)
       .send()
       .await
       .map_err(|e| anyhow::anyhow!("Failed to send request: {}", e))?;
@@ -134,9 +151,19 @@ impl UnifiedAPI {
       anyhow::bail!("Request failed with response: {:#?}", res);
     }
 
-    log::info!("Successful got response of ids '{:?}'", ids);
-
     Ok(res)
+  }
+
+  fn request_client(&self) -> anyhow::Result<Client> {
+    if self.http_version == http::Version::HTTP_2 {
+      Client::builder()
+      .http2_prior_knowledge()
+        .use_rustls_tls()
+        .build()
+        .map_err(|e| anyhow::anyhow!("Failed to create new request client: {}", e))
+    } else {
+      Ok(Client::new())
+    }
   }
 }
 
@@ -144,6 +171,27 @@ impl UnifiedAPI {
   pub fn new(base_url: &str) -> Self {
     Self {
       base_url: base_url.to_owned(),
+      http_version: http::Version::HTTP_2,
+    }
+  }
+
+  pub fn new_with_http_1(base_url: &str) -> Self {
+    Self {
+      base_url: base_url.to_owned(),
+      http_version: http::Version::HTTP_11
+    }
+  }
+}
+
+impl From<StringOrNumber> for u32 {
+  fn from(val: StringOrNumber) -> Self {
+    match val {
+      StringOrNumber::Number(value) => {
+        value
+      }
+      StringOrNumber::String(value) => {
+        value.parse().unwrap()
+      }
     }
   }
 }

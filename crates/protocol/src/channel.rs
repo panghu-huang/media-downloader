@@ -24,12 +24,14 @@ pub struct MediaMetadata {
   pub channel: String,
   pub id: String,
   pub name: String,
+  pub poster_url: String,
   pub release_year: u32,
   pub description: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchMediaRequest {
+  pub channel: Option<String>,
   pub keyword: String,
   pub page: u32,
   pub page_size: u32,

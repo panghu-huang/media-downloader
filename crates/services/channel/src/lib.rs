@@ -77,7 +77,8 @@ impl ChannelExt for ChannelService {
     let request = request.into_inner();
     log::info!("Searching media metadata of {}", request.keyword);
 
-    let channel = self.get_channel_by_name(&self.default_channel)?;
+    let channel_name = request.channel.as_ref().unwrap_or(&self.default_channel);
+    let channel = self.get_channel_by_name(channel_name)?;
 
     let search_result = channel
       .search_media(&request)
@@ -107,8 +108,8 @@ impl ChannelService {
 
     let mut channels = HashMap::new();
 
-    for (channel_name, config) in &config.unified_channels {
-      let unified_channel = UnifiedMediaService::new(channel_name, &config.base_url);
+    for (channel_name, config) in &config.channel.unified_channels {
+      let unified_channel = UnifiedMediaService::new(channel_name, config);
 
       log::info!(
         "Adding new unified channel {} with base URL {} ... ",
@@ -124,7 +125,7 @@ impl ChannelService {
 
     Self {
       channels,
-      default_channel: config.default_channel.clone(),
+      default_channel: config.channel.default.clone(),
       destination_dir: destination_dir(),
     }
   }

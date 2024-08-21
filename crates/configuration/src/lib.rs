@@ -21,7 +21,17 @@ pub struct AppConfiguration {
 
 #[derive(Deserialize, Clone)]
 pub struct UnifiedItemConfig {
+  #[serde(rename = "url")]
   pub base_url: String,
+  #[serde(rename = "http-version")]
+  pub http_version: Option<u8>,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct ChannelConfig {
+  #[serde(rename = "unified-channels")]
+  pub unified_channels: HashMap<String, UnifiedItemConfig>,
+  pub default: String,
 }
 
 #[derive(Deserialize, Clone)]
@@ -34,9 +44,7 @@ pub struct DatabaseConfig {
 pub struct UserConfiguration {
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
-  #[serde(rename = "unified-channels")]
-  pub unified_channels: HashMap<String, UnifiedItemConfig>,
-  pub default_channel: String,
+  pub channel: ChannelConfig,
 }
 
 // Configuration is a structure composed of user configuration and environment configuration.
@@ -45,8 +53,7 @@ pub struct Configuration {
   pub environment: Environment,
   pub app: AppConfiguration,
   pub database: DatabaseConfig,
-  pub unified_channels: HashMap<String, UnifiedItemConfig>,
-  pub default_channel: String,
+  pub channel: ChannelConfig,
 }
 
 impl Configuration {
@@ -85,8 +92,7 @@ impl Configuration {
       environment: env,
       app: user_config.app,
       database: user_config.database,
-      unified_channels: user_config.unified_channels,
-      default_channel: user_config.default_channel,
+      channel: user_config.channel,
     })
   }
 }

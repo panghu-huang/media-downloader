@@ -1,8 +1,17 @@
 use crate::extracts::{JsonBody, RpcClient};
-use axum::extract::{Json, Path};
+use axum::extract::{Json, Path, Query};
 use axum::http::StatusCode;
 use protocol::media::DownloadMediaRequest;
 use protocol::media::{GetMediaMetadataRequest, MediaMetadata};
+use protocol::media::{SearchMediaRequest, SearchMediaResponse};
+
+#[derive(serde::Deserialize)]
+pub struct SearchMediaQuery {
+  pub channel: Option<String>,
+  pub keyword: String,
+  pub page: Option<u32>,
+  pub page_size: Option<u32>,
+}
 
 /// Handler for `POST /api/v1/media/download`
 pub async fn download_media(
@@ -27,6 +36,25 @@ pub async fn get_media_metadata(
     .get_media_metadata(GetMediaMetadataRequest { channel, media_id })
     .await?
     .into_inner();
+
+  Ok(Json(res))
+}
+
+/// Handler for `GET /api/v1/media/search`
+pub async fn search_media(
+  RpcClient(rpc_client): RpcClient,
+  Query(query): Query<SearchMediaQuery>,
+) -> crate::Result<Json<SearchMediaResponse>> {
+  let mut media_client = rpc_client.media.clone();
+
+  let request = SearchMediaRequest {
+    keyword: query.keyword,
+    channel: query.channel,
+    page: query.page.unwrap_or(1),
+    page_size: query.page_size.unwrap_or(20),
+  };
+
+  let res = media_client.search_media(request).await?.into_inner();
 
   Ok(Json(res))
 }
