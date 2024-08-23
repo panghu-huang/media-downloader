@@ -3,6 +3,7 @@ use crate::component::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::prelude::*;
 use ratatui::widgets::*;
+use symbols::border;
 
 pub struct SearchInput {
   editing: bool,
@@ -51,7 +52,7 @@ impl Component for SearchInput {
       SearchAction::StartEditing => {
         self.start_editing();
       }
-      SearchAction::Completed
+      SearchAction::Completed(_)
       | SearchAction::Cancelled
       | SearchAction::Pending
       | SearchAction::Search(_) => {
@@ -63,17 +64,17 @@ impl Component for SearchInput {
     Ok(None)
   }
 
-  fn render(&self, frame: &mut Frame, area: Rect) {
+  fn render(&mut self, frame: &mut Frame, area: Rect) {
     let text = Text::from(self.inputs.iter().collect::<String>());
 
-    let block_style = if self.editing {
-      Style::default().white()
+    let block = Block::bordered().title(" Search ");
+    let block = if self.editing {
+      block.border_set(border::DOUBLE)
     } else {
-      Style::default().fg(Color::Indexed(248))
+      block.border_set(border::ROUNDED)
     };
 
-    let paragraph =
-      Paragraph::new(text).block(Block::bordered().title(" Search ").style(block_style));
+    let paragraph = Paragraph::new(text).block(block);
 
     frame.render_widget(paragraph, area);
   }

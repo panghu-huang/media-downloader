@@ -9,3 +9,4 @@ crossterm = { workspace = true, features = ["event-stream"] }
 tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread", "signal"] }
 anyhow = { workspace = true }
 tokio-stream = { workspace = true }
+protocol = { workspace = true }

@@ -1,6 +1,5 @@
 use crate::actions::Action;
-use crate::component::{BoxedComponent, Component};
-use crate::layouts::status_bar::StatusBar;
+use crate::component::BoxedComponent;
 use crate::state::{AppState, CurrentlyView};
 use crate::terminal::{Terminal, TerminalEvent};
 use crate::views::dashboard::Dashboard;
@@ -14,7 +13,7 @@ use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 pub struct App {
   should_quit: bool,
   state: AppState,
-  status_bar: StatusBar,
+  //status_bar: StatusBar,
   currently_view: BoxedComponent<Action>,
   actions_rx: UnboundedReceiver<Action>,
   actions_tx: UnboundedSender<Action>,
@@ -30,7 +29,7 @@ impl App {
       actions_tx,
       should_quit: false,
       state: AppState::default(),
-      status_bar: StatusBar::default(),
+      //status_bar: StatusBar::default(),
       currently_view: Box::new(dashboard) as BoxedComponent<Action>,
     }
   }
@@ -100,10 +99,9 @@ impl App {
       if let Some(action) = self.currently_view.update(&action)? {
         self.actions_tx.send(action)?;
       }
-
-      if let Some(action) = self.status_bar.update(&action)? {
-        self.actions_tx.send(action)?;
-      }
+      //if let Some(action) = self.status_bar.update(&action)? {
+      //  self.actions_tx.send(action)?;
+      //}
     }
 
     Ok(())
@@ -129,25 +127,22 @@ impl App {
     if let Some(action) = self.currently_view.on_key_event(event)? {
       self.actions_tx.send(action)?;
     }
-
-    if let Some(action) = self.status_bar.on_key_event(event)? {
-      self.actions_tx.send(action)?;
-    }
+    //
+    //if let Some(action) = self.status_bar.on_key_event(event)? {
+    //  self.actions_tx.send(action)?;
+    //}
 
     Ok(())
   }
 
   fn render(&mut self, terminal: &mut Terminal) -> io::Result<()> {
     terminal.draw(|frame| {
-      let layout_chunks =
-        Layout::vertical([Constraint::Min(1), Constraint::Length(1)]).split(frame.area());
-
-      let bg = Block::default().bg(Color::Indexed(93));
+      let bg = Block::default().bg(Color::Indexed(90));
 
       frame.render_widget(bg, frame.area());
 
-      self.status_bar.render(frame, layout_chunks[1]);
-      self.currently_view.render(frame, layout_chunks[0]);
+      //self.status_bar.render(frame, layout_chunks[1]);
+      self.currently_view.render(frame, frame.area());
     })?;
 
     Ok(())

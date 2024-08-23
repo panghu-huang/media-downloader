@@ -8,7 +8,7 @@ pub struct Dashboard;
 impl Component for Dashboard {
   type Action = crate::actions::Action;
 
-  fn render(&self, frame: &mut Frame, area: Rect) {
+  fn render(&mut self, frame: &mut Frame, area: Rect) {
     let key_bindings = vec![
       KeyBinding {
         description: "Quit".into(),

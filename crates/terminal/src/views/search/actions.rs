@@ -1,9 +1,10 @@
+use protocol::channel::SearchMediaResponse;
+
 pub enum SearchAction {
   Pending,
   StartEditing,
   KeywordChanged,
   Search(String),
-  Completed,
+  Completed(SearchMediaResponse),
   Cancelled,
-  Clear,
 }

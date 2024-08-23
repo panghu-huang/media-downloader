@@ -14,7 +14,7 @@ pub trait Component {
     Ok(None)
   }
 
-  fn render(&self, frame: &mut Frame, area: Rect);
+  fn render(&mut self, frame: &mut Frame, area: Rect);
 }
 
 pub type BoxedComponent<A> = Box<dyn Component<Action = A>>;

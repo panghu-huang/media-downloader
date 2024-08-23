@@ -21,7 +21,7 @@ impl Component for StatusBar {
     Ok(None)
   }
 
-  fn render(&self, frame: &mut Frame, area: Rect) {
+  fn render(&mut self, frame: &mut Frame, area: Rect) {
     let layout_chunks =
       Layout::horizontal([Constraint::Length(12), Constraint::Min(1)]).split(area);
 
