@@ -10,3 +10,4 @@ tokio = { workspace = true, features = ["sync", "macros", "rt-multi-thread", "si
 anyhow = { workspace = true }
 tokio-stream = { workspace = true }
 protocol = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }

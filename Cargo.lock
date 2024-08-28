@@ -2942,6 +2942,7 @@ dependencies = [
  "crossterm",
  "protocol",
  "ratatui",
+ "reqwest",
  "tokio",
  "tokio-stream",
 ]

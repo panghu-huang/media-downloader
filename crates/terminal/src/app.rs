@@ -1,4 +1,5 @@
 use crate::actions::Action;
+use crate::api::API;
 use crate::component::BoxedComponent;
 use crate::state::{AppState, CurrentlyView};
 use crate::terminal::{Terminal, TerminalEvent};
@@ -10,9 +11,12 @@ use ratatui::widgets::*;
 use std::io;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
+const API_BASE_URL: &str = "http://192.168.3.4:5231";
+
 pub struct App {
   should_quit: bool,
   state: AppState,
+  api: API,
   //status_bar: StatusBar,
   currently_view: BoxedComponent<Action>,
   actions_rx: UnboundedReceiver<Action>,
@@ -22,15 +26,16 @@ pub struct App {
 impl App {
   pub fn new() -> Self {
     let (actions_tx, actions_rx) = unbounded_channel();
-    let dashboard = Dashboard;
+    let api = API::new(API_BASE_URL);
 
     Self {
+      api,
       actions_rx,
       actions_tx,
       should_quit: false,
       state: AppState::default(),
       //status_bar: StatusBar::default(),
-      currently_view: Box::new(dashboard) as BoxedComponent<Action>,
+      currently_view: Box::new(Dashboard) as BoxedComponent<Action>,
     }
   }
 
@@ -82,7 +87,7 @@ impl App {
           self.render(terminal)?;
         }
         Action::EnterSearchView => {
-          self.currently_view = Box::new(Search::default());
+          self.currently_view = Box::new(Search::new(&self.api));
           self.state.editing = true;
 
           self.actions_tx.send(Action::Render)?;

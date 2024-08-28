@@ -7,4 +7,5 @@ pub enum SearchAction {
   Search(String),
   Completed(SearchMediaResponse),
   Cancelled,
+  Error(String),
 }

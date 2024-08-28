@@ -3,15 +3,16 @@ mod search_input;
 
 use self::actions::SearchAction;
 use self::search_input::SearchInput;
+use crate::api::{SearchMediaOptions, API};
 use crate::component::Component;
 use crossterm::event::{KeyCode, KeyEvent};
-use protocol::channel::{MediaMetadata, SearchMediaResponse};
+use protocol::channel::SearchMediaResponse;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::symbols::border;
 use ratatui::text::{Line, Text};
 use ratatui::widgets::block::Title;
-use ratatui::widgets::{Block, Paragraph, Row, Table, TableState};
+use ratatui::widgets::{Block, Cell, Paragraph, Row, Table, TableState};
 use ratatui::Frame;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 
@@ -21,6 +22,7 @@ enum SearchState {
   Input,
   Searching,
   Completed(SearchMediaResponse),
+  Error(String),
 }
 
 impl SearchState {
@@ -29,59 +31,41 @@ impl SearchState {
   }
 
   fn is_completed(&self) -> bool {
-    matches!(self, Self::Completed(_))
+    matches!(self, Self::Completed(_)) || matches!(self, Self::Error(_))
   }
 }
 
 pub struct Search {
+  api: API,
   input: SearchInput,
   state: SearchState,
   table_state: TableState,
+  search_options: Option<SearchMediaOptions>,
   actions_rx: UnboundedReceiver<SearchAction>,
   actions_tx: UnboundedSender<SearchAction>,
 }
 
 impl Search {
-  fn search(&self, keyword: String) {
+  fn search(&self) {
     tokio::spawn({
+      let search_options = self.search_options.clone().unwrap();
+      let api = self.api.clone();
+
       let tx = self.actions_tx.clone();
 
       async move {
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let response = match api.media.search(&search_options).await {
+          Ok(res) => res,
+          Err(err) => {
+            tx.send(SearchAction::Error(err.to_string()))?;
 
-        let response = SearchMediaResponse {
-          total: 3,
-          page: 1,
-          page_size: 20,
-          items: vec![
-            MediaMetadata {
-              name: "Title".to_string(),
-              release_year: 2021,
-              channel: "Channel".to_string(),
-              id: "id".to_string(),
-              poster_url: "".to_string(),
-              description: "description".to_string(),
-            },
-            MediaMetadata {
-              name: "海贼王".to_string(),
-              release_year: 2021,
-              channel: "Channel".to_string(),
-              id: "id".to_string(),
-              poster_url: "".to_string(),
-              description: "descriptiondescriptiondescription".to_string(),
-            },
-            MediaMetadata {
-              name: "Long description abcd".to_string(),
-              release_year: 2021,
-              channel: "Channel".to_string(),
-              id: "id".to_string(),
-              poster_url: "".to_string(),
-              description: "descriptiondescriptiondescriptiondescription".to_string(),
-            },
-          ],
+            return Err(err);
+          }
         };
 
-        tx.send(SearchAction::Completed(response)).unwrap();
+        tx.send(SearchAction::Completed(response))?;
+
+        Ok::<_, anyhow::Error>(())
       }
     });
   }
@@ -133,13 +117,13 @@ impl Search {
     for (idx, item) in res.items.clone().iter().enumerate() {
       rows.push(
         Row::new(vec![
-          (idx + 1).to_string().into(),
-          item.name.clone().bold(),
-          item.release_year.to_string().into(),
-          item.description.clone().into(),
-          item.channel.clone().into(),
+          Cell::from(format!("\n{}", idx + 1)),
+          Cell::from(format!("\n{}", item.name)),
+          Cell::from(format!("\n{}", item.release_year)),
+          Cell::from(format!("\n{}", item.description)),
+          Cell::from(format!("\n{}", item.channel)),
         ])
-        .height(2),
+        .height(3),
       );
     }
 
@@ -241,9 +225,14 @@ impl Component for Search {
         }
         SearchAction::Search(keyword) => {
           self.state = SearchState::Searching;
-          self.search(keyword);
+          self.search_options = Some(SearchMediaOptions { keyword, page: 1 });
+
+          self.search();
 
           return Ok(Some(Self::Action::EndEditing));
+        }
+        SearchAction::Error(msg) => {
+          self.state = SearchState::Error(msg);
         }
         SearchAction::KeywordChanged => {}
       }
@@ -275,17 +264,25 @@ impl Component for Search {
         let paragraph = Paragraph::new(text).block(Block::default()).centered();
         frame.render_widget(paragraph, layout_chunks[1]);
       }
+      SearchState::Error(err) => {
+        let text = Text::from(format!("Error: {}", err));
+
+        let paragraph = Paragraph::new(text).block(Block::default()).centered();
+        frame.render_widget(paragraph, layout_chunks[1]);
+      }
     }
   }
 }
 
-impl Default for Search {
-  fn default() -> Self {
+impl Search {
+  pub fn new(api: &API) -> Self {
     let (actions_tx, actions_rx) = unbounded_channel();
 
     Self {
+      api: api.clone(),
       input: SearchInput::new_with_editing(true),
       state: SearchState::Input,
+      search_options: None,
       table_state: TableState::default().with_selected(0),
       actions_rx,
       actions_tx,
