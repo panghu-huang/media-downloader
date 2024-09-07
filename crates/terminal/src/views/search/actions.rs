@@ -8,4 +8,5 @@ pub enum SearchAction {
   Completed(SearchMediaResponse),
   Cancelled,
   Error(String),
+  Render,
 }

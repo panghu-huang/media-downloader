@@ -158,6 +158,31 @@ pub mod channel_client {
                 .insert(GrpcMethod::new("channel.Channel", "SearchMedia"));
             self.inner.unary(req, path, codec).await
         }
+        pub async fn get_media_playlist(
+            &mut self,
+            request: impl tonic::IntoRequest<crate::channel::GetMediaPlaylistRequest>,
+        ) -> std::result::Result<
+            tonic::Response<crate::channel::MediaPlaylist>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = crate::json_codec::JsonCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/channel.Channel/GetMediaPlaylist",
+            );
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("channel.Channel", "GetMediaPlaylist"));
+            self.inner.unary(req, path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -192,6 +217,13 @@ pub mod channel_server {
             request: tonic::Request<crate::channel::SearchMediaRequest>,
         ) -> std::result::Result<
             tonic::Response<crate::channel::SearchMediaResponse>,
+            tonic::Status,
+        >;
+        async fn get_media_playlist(
+            &self,
+            request: tonic::Request<crate::channel::GetMediaPlaylistRequest>,
+        ) -> std::result::Result<
+            tonic::Response<crate::channel::MediaPlaylist>,
             tonic::Status,
         >;
     }
@@ -402,6 +434,55 @@ pub mod channel_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = SearchMediaSvc(inner);
+                        let codec = crate::json_codec::JsonCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/channel.Channel/GetMediaPlaylist" => {
+                    #[allow(non_camel_case_types)]
+                    struct GetMediaPlaylistSvc<T: Channel>(pub Arc<T>);
+                    impl<
+                        T: Channel,
+                    > tonic::server::UnaryService<
+                        crate::channel::GetMediaPlaylistRequest,
+                    > for GetMediaPlaylistSvc<T> {
+                        type Response = crate::channel::MediaPlaylist;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                crate::channel::GetMediaPlaylistRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as Channel>::get_media_playlist(&inner, request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = GetMediaPlaylistSvc(inner);
                         let codec = crate::json_codec::JsonCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

@@ -1,4 +1,5 @@
 mod actions;
+mod completed;
 mod search_input;
 
 use self::actions::SearchAction;
@@ -39,10 +40,10 @@ pub struct Search {
   api: API,
   input: SearchInput,
   state: SearchState,
-  table_state: TableState,
   search_options: Option<SearchMediaOptions>,
   actions_rx: UnboundedReceiver<SearchAction>,
   actions_tx: UnboundedSender<SearchAction>,
+  content: Option<Box<dyn Component<Action = SearchAction>>>,
 }
 
 impl Search {
@@ -77,72 +78,6 @@ impl Search {
 
     frame.render_widget(paragraph, area);
   }
-
-  fn render_completed(&mut self, frame: &mut Frame, area: Rect) {
-    let mut rows = vec![];
-
-    let SearchState::Completed(res) = &self.state else {
-      return;
-    };
-
-    // Render tip & total count of media
-
-    let total_page = (res.total as f32 / res.page_size as f32).ceil() as u32;
-
-    let page_line = Line::from(vec![
-      "Total pages found: ".into(),
-      format!("{}.", total_page).bold().red(),
-      " <Left / H> ".bold().green(),
-      "to previous page".into(),
-      " <Right / L> ".bold().green(),
-      "to next page".into(),
-    ]);
-
-    let page_info = Title::from(page_line)
-      .alignment(Alignment::Center)
-      .position(ratatui::widgets::block::Position::Bottom);
-
-    let block = Block::bordered()
-      .title(
-        Title::from(format!(
-          " Total media found: {}. Press 'c' to clear ",
-          res.total
-        ))
-        .alignment(Alignment::Center),
-      )
-      .title(page_info)
-      .border_set(border::ROUNDED);
-
-    // Render media list
-    for (idx, item) in res.items.clone().iter().enumerate() {
-      rows.push(
-        Row::new(vec![
-          Cell::from(format!("\n{}", idx + 1)),
-          Cell::from(format!("\n{}", item.name)),
-          Cell::from(format!("\n{}", item.release_year)),
-          Cell::from(format!("\n{}", item.description)),
-          Cell::from(format!("\n{}", item.channel)),
-        ])
-        .height(3),
-      );
-    }
-
-    let widths = [
-      Constraint::Length(3),
-      Constraint::Length(28),
-      Constraint::Length(8),
-      Constraint::Min(2),
-      Constraint::Length(10),
-    ];
-
-    let selected_style = Style::default().bg(Color::Indexed(127));
-
-    let table = Table::new(rows, widths)
-      .block(block)
-      .highlight_style(selected_style);
-
-    frame.render_stateful_widget(table, area, &mut self.table_state);
-  }
 }
 
 impl Component for Search {
@@ -153,36 +88,15 @@ impl Component for Search {
       self.actions_tx.send(action)?;
     }
 
+    if let Some(content) = self.content.as_mut() {
+      if let Some(action) = content.on_key_event(key_event)? {
+        self.actions_tx.send(action)?;
+      }
+    }
+
     match key_event.code {
       KeyCode::Char('s') if self.state.is_pending() => {
         self.actions_tx.send(SearchAction::StartEditing)?;
-      }
-      KeyCode::Char('c') if self.state.is_completed() => {
-        self.actions_tx.send(SearchAction::Pending)?;
-      }
-      KeyCode::Down | KeyCode::Char('j') => {
-        if let SearchState::Completed(res) = &self.state {
-          let current_index = self.table_state.selected().unwrap_or(0);
-
-          if current_index == res.items.len() - 1 {
-            self.table_state.select_first();
-          } else {
-            self.table_state.select_next();
-          }
-
-          return Ok(Some(Self::Action::Render));
-        }
-      }
-      KeyCode::Up | KeyCode::Char('k') if self.state.is_completed() => {
-        let current_index = self.table_state.selected().unwrap_or(0);
-
-        if current_index == 0 {
-          self.table_state.select_last();
-        } else {
-          self.table_state.select_previous();
-        }
-
-        return Ok(Some(Self::Action::Render));
       }
       _ => {}
     };
@@ -206,8 +120,8 @@ impl Component for Search {
 
       match action {
         SearchAction::Completed(res) => {
-          self.table_state.select_first();
-          self.state = SearchState::Completed(res);
+          self.state = SearchState::Completed(res.clone());
+          self.content = Some(Box::new(completed::SearchCompeted::new(res)));
         }
         SearchAction::Cancelled => {
           self.state = SearchState::Pending;
@@ -234,7 +148,7 @@ impl Component for Search {
         SearchAction::Error(msg) => {
           self.state = SearchState::Error(msg);
         }
-        SearchAction::KeywordChanged => {}
+        _ => {}
       }
     }
 
@@ -251,7 +165,9 @@ impl Component for Search {
         self.render_searching(frame, layout_chunks[1]);
       }
       SearchState::Completed(_) => {
-        self.render_completed(frame, layout_chunks[1]);
+        if let Some(content) = self.content.as_mut() {
+          content.render(frame, layout_chunks[1]);
+        }
       }
       SearchState::Pending => {
         let text = Text::from("Press 's' to start searching");
@@ -283,7 +199,7 @@ impl Search {
       input: SearchInput::new_with_editing(true),
       state: SearchState::Input,
       search_options: None,
-      table_state: TableState::default().with_selected(0),
+      content: None,
       actions_rx,
       actions_tx,
     }

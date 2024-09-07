@@ -30,6 +30,26 @@ pub struct MediaMetadata {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetMediaPlaylistRequest {
+  pub channel: String,
+  pub media_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MediaPlaylistItem {
+  pub number: u32,
+  pub text: String,
+  pub url: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MediaPlaylist {
+  pub channel: String,
+  pub media_id: String,
+  pub items: Vec<MediaPlaylistItem>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SearchMediaRequest {
   pub channel: Option<String>,
   pub keyword: String,

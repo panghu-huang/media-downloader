@@ -5,6 +5,7 @@ use configuration::Configuration;
 use protocol::channel::ChannelExt;
 use protocol::channel::DownloadMediaRequest;
 use protocol::channel::{GetMediaMetadataRequest, MediaMetadata};
+use protocol::channel::{GetMediaPlaylistRequest, MediaPlaylist};
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::tonic;
 use protocol::tonic::{async_trait, Request, Response, Status};
@@ -86,6 +87,23 @@ impl ChannelExt for ChannelService {
       .map_err(|e| Status::internal(format!("Failed to search media: {}", e)))?;
 
     Ok(Response::new(search_result))
+  }
+
+  async fn get_media_playlist(
+    &self,
+    request: Request<GetMediaPlaylistRequest>,
+  ) -> tonic::Result<Response<MediaPlaylist>> {
+    let request = request.into_inner();
+    log::info!("Getting media playlist of {}", request.media_id);
+
+    let channel = self.get_channel_by_name(&request.channel)?;
+
+    let playlist = channel
+      .get_media_playlist(&request.media_id)
+      .await
+      .map_err(|e| Status::internal(format!("Failed to get media playlist: {}", e)))?;
+
+    Ok(Response::new(playlist))
   }
 }
 

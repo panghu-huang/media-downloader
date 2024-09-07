@@ -9,6 +9,7 @@ fn main() {
       rpc DownloadMedia(crate::channel::DownloadMediaRequest) returns (stream crate::DownloadProgressItem) {}
       rpc GetMediaMetadata(crate::channel::GetMediaMetadataRequest) returns (crate::channel::MediaMetadata) {}
       rpc SearchMedia(crate::channel::SearchMediaRequest) returns (crate::channel::SearchMediaResponse) {}
+      rpc GetMediaPlaylist(crate::channel::GetMediaPlaylistRequest) returns (crate::channel::MediaPlaylist) {}
     }
   };
 
@@ -20,6 +21,7 @@ fn main() {
       rpc DownloadMedia(crate::media::DownloadMediaRequest) returns (crate::Empty) {}
       rpc GetMediaMetadata(crate::media::GetMediaMetadataRequest) returns (crate::media::MediaMetadata) {}
       rpc SearchMedia(crate::media::SearchMediaRequest) returns (crate::media::SearchMediaResponse) {}
+      rpc GetMediaPlaylist(crate::media::GetMediaPlaylistRequest) returns (crate::media::MediaPlaylist) {}
     }
   };
 

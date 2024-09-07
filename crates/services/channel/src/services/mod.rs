@@ -2,6 +2,7 @@ pub mod unified;
 
 use protocol::channel::MediaMetadata;
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
+use protocol::media::MediaPlaylist;
 use protocol::DownloadProgressReceiver;
 use std::path::PathBuf;
 
@@ -21,4 +22,5 @@ pub trait MediaChannelExt: Send + Sync {
   async fn get_media_metadata(&self, media_id: &str) -> anyhow::Result<MediaMetadata>;
   async fn search_media(&self, request: &SearchMediaRequest)
     -> anyhow::Result<SearchMediaResponse>;
+  async fn get_media_playlist(&self, media_id: &str) -> anyhow::Result<MediaPlaylist>;
 }

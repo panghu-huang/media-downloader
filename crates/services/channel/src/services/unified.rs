@@ -5,6 +5,7 @@ use crate::services::DownloadMediaOptions;
 use crate::services::MediaChannelExt;
 use configuration::UnifiedItemConfig;
 use protocol::channel::MediaMetadata;
+use protocol::channel::{MediaPlaylist, MediaPlaylistItem};
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::DownloadProgressReceiver;
 
@@ -121,6 +122,32 @@ impl MediaChannelExt for UnifiedMediaService {
       page_size,
       page: search_result.page.into(),
       total: search_result.total,
+    })
+  }
+
+  async fn get_media_playlist(&self, media_id: &str) -> anyhow::Result<crate::MediaPlaylist> {
+    let detail = self.get_media_detail(media_id).await?;
+
+    let playlist: Vec<MediaPlaylistItem> = detail
+      .play_url
+      .split('#')
+      .enumerate()
+      .map(|(index, url)| {
+        let number = index + 1;
+        let name_and_url = url.split('$').collect::<Vec<_>>();
+
+        MediaPlaylistItem {
+          number: number as u32,
+          text: name_and_url.first().unwrap_or(&"").to_string(),
+          url: name_and_url.get(1).unwrap_or(&"").to_string(),
+        }
+      })
+      .collect();
+
+    Ok(MediaPlaylist {
+      channel: self.channel_name.clone(),
+      media_id: media_id.to_string(),
+      items: playlist,
     })
   }
 }

@@ -2,6 +2,10 @@ pub type DownloadMediaRequest = crate::channel::DownloadMediaRequest;
 
 pub type GetMediaMetadataRequest = crate::channel::GetMediaMetadataRequest;
 
+pub type GetMediaPlaylistRequest = crate::channel::GetMediaPlaylistRequest;
+
+pub type MediaPlaylist = crate::channel::MediaPlaylist;
+
 pub type SearchMediaRequest = crate::channel::SearchMediaRequest;
 
 pub type SearchMediaResponse = crate::channel::SearchMediaResponse;
