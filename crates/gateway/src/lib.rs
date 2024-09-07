@@ -52,6 +52,7 @@ impl Gateway {
         get(media::get_media_metadata),
       )
       .route("/media/download", post(media::download_media))
+      .route("/media/batch_download", post(media::batch_download_media))
       .route("/media/search", get(media::search_media))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))

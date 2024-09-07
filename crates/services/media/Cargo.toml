@@ -11,5 +11,6 @@ models = { workspace = true }
 
 # External dependencies
 tokio = { workspace = true }
+anyhow = { workspace = true }
 log = { workspace = true }
 tokio-stream = { workspace = true }

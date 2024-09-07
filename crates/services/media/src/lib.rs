@@ -1,3 +1,4 @@
+use protocol::media::BatchDownloadMediaRequest;
 use protocol::media::DownloadMediaRequest;
 use protocol::media::MediaExt;
 use protocol::media::{GetMediaMetadataRequest, MediaMetadata};
@@ -23,24 +24,10 @@ impl MediaExt for MediaService {
       request.number
     );
 
-    let mut channel_client = self.rpc_client.channel.clone();
-
-    tokio::spawn(async move {
-      let res = channel_client.download_media(request.clone()).await;
-
-      match res {
-        Ok(res) => {
-          log::info!("successful to request download tv show");
-
-          let mut progress = res.into_inner();
-
-          while let Some(evt) = progress.message().await.unwrap() {
-            log::info!("Event {:#?}", evt);
-          }
-
-          log::info!("Done");
-        }
-        Err(err) => {
+    tokio::spawn({
+      let channel_client = self.rpc_client.channel.clone();
+      async move {
+        if let Err(err) = Self::download_media(channel_client, request.clone()).await {
           log::info!(
             "Failed to download media {}(#{:?}): {}",
             request.media_id,
@@ -100,6 +87,72 @@ impl MediaExt for MediaService {
       .into_inner();
 
     Ok(Response::new(res))
+  }
+
+  async fn batch_download_media(
+    &self,
+    request: Request<BatchDownloadMediaRequest>,
+  ) -> tonic::Result<Response<protocol::Empty>> {
+    // TODO: Validate download range
+    let request = request.into_inner();
+    log::info!(
+      "Downloading media {} in batch (#{:?} - {})",
+      request.media_id,
+      request.start_number,
+      request.count,
+    );
+
+    tokio::spawn({
+      let channel_client = self.rpc_client.channel.clone();
+      let batch_request = request.clone();
+
+      async move {
+        for idx in 0..batch_request.count {
+          let start_number = batch_request.start_number + (idx as u32);
+
+          if let Err(err) = Self::download_media(
+            channel_client.clone(),
+            DownloadMediaRequest {
+              channel: batch_request.channel.clone(),
+              media_id: batch_request.media_id.clone(),
+              number: Some(start_number),
+            },
+          )
+          .await
+          {
+            log::info!(
+              "Failed to download media {}(#{:?}): {}",
+              request.media_id,
+              start_number,
+              err,
+            );
+          }
+        }
+      }
+    });
+
+    Ok(Response::new(protocol::Empty {}))
+  }
+}
+
+impl MediaService {
+  async fn download_media(
+    mut channel_client: protocol::channel::ChannelClient<tonic::transport::Channel>,
+    request: DownloadMediaRequest,
+  ) -> anyhow::Result<()> {
+    let res = channel_client.download_media(request).await?;
+
+    log::info!("successful to request download media");
+
+    let mut progress = res.into_inner();
+
+    while let Some(evt) = progress.message().await.unwrap() {
+      log::info!("Event {:#?}", evt);
+    }
+
+    log::info!("Done");
+
+    Ok(())
   }
 }
 

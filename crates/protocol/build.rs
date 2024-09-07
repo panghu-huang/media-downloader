@@ -22,6 +22,7 @@ fn main() {
       rpc GetMediaMetadata(crate::media::GetMediaMetadataRequest) returns (crate::media::MediaMetadata) {}
       rpc SearchMedia(crate::media::SearchMediaRequest) returns (crate::media::SearchMediaResponse) {}
       rpc GetMediaPlaylist(crate::media::GetMediaPlaylistRequest) returns (crate::media::MediaPlaylist) {}
+      rpc BatchDownloadMedia(crate::media::BatchDownloadMediaRequest) returns (crate::Empty) {}
     }
   };
 
