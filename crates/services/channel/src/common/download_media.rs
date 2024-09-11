@@ -42,7 +42,7 @@ pub async fn download_media(
       .await
       {
         log::error!("Failed download video: {}", err);
-        download_progress_stream.done();
+        download_progress_stream.failed(&err.to_string());
 
         anyhow::bail!(err)
       }
@@ -79,17 +79,21 @@ async fn download_and_transform(
 
   fs::write(&m3u8_path, bytes).await?;
 
-  download_progress_stream.in_progress("Transforming video ... ");
+  download_progress_stream.transforming_video();
+
+  if destination_path.exists() {
+    log::info!("Download file exists. removing it");
+    fs::remove_file(&destination_path).await?;
+  }
 
   log::info!("Transforming video ... ");
 
   fs::create_dir_all(destination_path.parent().unwrap()).await?;
 
-  if let Err(err) = transform_video(&m3u8_path, &destination_path).await {
-    log::error!("Failed to tranform video: {}", err);
-  }
+  transform_video(&m3u8_path, &destination_path).await?;
 
-  download_progress_stream.done();
+  log::info!("Done. {:?}", destination_path);
+  download_progress_stream.done(&destination_path.to_string_lossy());
 
   Ok(()) as anyhow::Result<()>
 }
@@ -115,10 +119,10 @@ async fn download_segments_of_playlist(
 
         let downloaded_path = download_media_segment(&uri).await?;
 
-        stream.in_progress(&format!("Segment downloaded: {}", idx));
+        stream.segment_downloaded(&format!("Segment downloaded: {}", idx));
 
-        // Wait 2s for avoid 429 error
-        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        // Wait 3s for avoid 429 error
+        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
         Ok(downloaded_path) as anyhow::Result<PathBuf>
       }
