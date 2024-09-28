@@ -208,18 +208,19 @@ async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
 }
 
 async fn transform_video(source: &Path, dest: &Path) -> anyhow::Result<()> {
-  let status = Command::new("ffmpeg")
+  let output = Command::new("ffmpeg")
     .arg("-i")
     .arg(source)
     .arg("-codec")
     .arg("copy")
     .arg(dest)
-    .stdout(Stdio::null())
-    .stderr(Stdio::null())
-    .status()?;
+    .output()?;
 
-  if !status.success() {
-    anyhow::bail!("invalid exit code");
+  if !output.status.success() {
+    log::error!("invalid exit code: {:?}", output.status);
+
+    log::error!("Stdout: {}", String::from_utf8(output.stdout)?);
+    log::error!("Stderr: {}", String::from_utf8(output.stderr)?);
   }
 
   Ok(())
