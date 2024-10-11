@@ -1,4 +1,4 @@
-pub mod users;
+pub mod download_records;
 
 use std::fmt::{self, Display, Formatter};
 use std::ops::Deref;
@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 )]
 #[sqlx(transparent)]
 pub struct Id(pub i32);
+
+pub type DateTime = chrono::DateTime<chrono::Utc>;
 
 impl Deref for Id {
   type Target = i32;

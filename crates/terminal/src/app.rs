@@ -40,7 +40,7 @@ impl App {
   }
 
   pub async fn run(&mut self) -> anyhow::Result<()> {
-    let mut terminal = Terminal::new(4, 60)?;
+    let mut terminal = Terminal::new(4)?;
 
     terminal.enter()?;
 

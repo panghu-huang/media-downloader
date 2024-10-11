@@ -2,12 +2,12 @@ use super::actions::SearchAction;
 use crate::component::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use protocol::channel::SearchMediaResponse;
-use ratatui::layout::{Alignment, Constraint, Layout, Rect};
+use ratatui::layout::{Alignment, Constraint, Rect};
 use ratatui::style::{Color, Style, Stylize};
 use ratatui::symbols::border;
-use ratatui::text::{Line, Text};
+use ratatui::text::Line;
 use ratatui::widgets::block::Title;
-use ratatui::widgets::{Block, Cell, Paragraph, Row, Table, TableState};
+use ratatui::widgets::{Block, Cell, Row, Table, TableState};
 use ratatui::Frame;
 
 pub struct SearchCompeted {
@@ -51,7 +51,7 @@ impl Component for SearchCompeted {
     Ok(None)
   }
 
-  fn update(&mut self, action: &Self::Action) -> anyhow::Result<Option<Self::Action>> {
+  fn update(&mut self, _action: &Self::Action) -> anyhow::Result<Option<Self::Action>> {
     Ok(None)
   }
 

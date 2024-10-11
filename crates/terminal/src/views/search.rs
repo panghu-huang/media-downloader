@@ -8,12 +8,9 @@ use crate::api::{SearchMediaOptions, API};
 use crate::component::Component;
 use crossterm::event::{KeyCode, KeyEvent};
 use protocol::channel::SearchMediaResponse;
-use ratatui::layout::{Alignment, Constraint, Layout, Rect};
-use ratatui::style::{Color, Style, Stylize};
-use ratatui::symbols::border;
-use ratatui::text::{Line, Text};
-use ratatui::widgets::block::Title;
-use ratatui::widgets::{Block, Cell, Paragraph, Row, Table, TableState};
+use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::text::Text;
+use ratatui::widgets::{Block, Paragraph};
 use ratatui::Frame;
 use tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
 

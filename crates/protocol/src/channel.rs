@@ -19,6 +19,15 @@ pub struct GetMediaMetadataRequest {
   pub media_id: String,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+pub enum MediaKind {
+  Movie,
+  TV,
+  Variety,
+  Anime,
+  Other,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MediaMetadata {
   pub channel: String,
@@ -27,6 +36,7 @@ pub struct MediaMetadata {
   pub poster_url: String,
   pub release_year: u32,
   pub description: String,
+  pub kind: MediaKind,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

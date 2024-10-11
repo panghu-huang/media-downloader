@@ -10,14 +10,12 @@ use tokio_stream::StreamExt;
 
 pub enum TerminalEvent {
   KeyEvent(KeyEvent),
-  Frame,
   Tick,
   Quit,
 }
 
 pub struct Terminal {
   pub tick_rate: u8,
-  pub frame_rate: u8,
   pub tui: ratatui::Terminal<CrosstermBackend<Stdout>>,
   pub event_loop: Option<tokio::task::JoinHandle<()>>,
   pub sender: UnboundedSender<TerminalEvent>,
@@ -25,7 +23,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
-  pub fn new(tick_rate: u8, frame_rate: u8) -> io::Result<Self> {
+  pub fn new(tick_rate: u8) -> io::Result<Self> {
     let (sender, receiver) = unbounded_channel();
     let backend = CrosstermBackend::new(io::stdout());
     let tui = ratatui::Terminal::new(backend)?;
@@ -33,7 +31,6 @@ impl Terminal {
     Ok(Terminal {
       tui,
       tick_rate,
-      frame_rate,
       sender,
       receiver,
       event_loop: None,

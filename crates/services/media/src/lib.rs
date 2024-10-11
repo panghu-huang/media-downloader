@@ -1,3 +1,4 @@
+use models::ConnectionPool;
 use protocol::media::BatchDownloadMediaRequest;
 use protocol::media::DownloadMediaRequest;
 use protocol::media::MediaExt;
@@ -13,6 +14,7 @@ use std::path::PathBuf;
 pub struct MediaService {
   media_dir: PathBuf,
   rpc_client: RpcClient,
+  connection_pool: ConnectionPool,
 }
 
 #[async_trait]
@@ -228,10 +230,11 @@ impl MediaService {
 }
 
 impl MediaService {
-  pub fn new(rpc_client: &RpcClient) -> Self {
+  pub fn new(rpc_client: &RpcClient, connection_pool: &ConnectionPool) -> Self {
     Self {
       media_dir: media_dir(),
       rpc_client: rpc_client.clone(),
+      connection_pool: connection_pool.clone(),
     }
   }
 }

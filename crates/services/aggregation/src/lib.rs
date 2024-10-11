@@ -44,11 +44,11 @@ impl AggregationService {
 
 pub fn create_aggregation_service(
   configuration: &Configuration,
-  _pool: &ConnectionPool,
+  pool: &ConnectionPool,
   rpc_client: &RpcClient,
 ) -> AggregationService {
   let channel = ChannelService::new(configuration);
-  let media = MediaService::new(rpc_client);
+  let media = MediaService::new(rpc_client, pool);
 
   AggregationService { channel, media }
 }

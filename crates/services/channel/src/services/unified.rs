@@ -24,7 +24,11 @@ impl MediaChannelExt for UnifiedMediaService {
     &self,
     options: DownloadMediaOptions,
   ) -> anyhow::Result<DownloadProgressReceiver> {
-    let detail = self.get_media_detail(&options.media_id).await?;
+    let response = self.get_media_detail(&options.media_id).await?;
+    let detail = response
+      .list
+      .first()
+      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", options.media_id))?;
 
     let mut play_url_list = detail.play_url.split('#');
 
@@ -59,11 +63,18 @@ impl MediaChannelExt for UnifiedMediaService {
   }
 
   async fn get_media_metadata(&self, media_id: &str) -> anyhow::Result<MediaMetadata> {
-    let detail = self.get_media_detail(media_id).await?;
+    let response = self.get_media_detail(media_id).await?;
+    let detail = response
+      .list
+      .first()
+      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", media_id))?
+      .clone();
 
     let release_year = detail.year.parse().unwrap_or(0);
+    let kind = detail.parse_media_kind(&response.class.clone().unwrap_or(vec![]));
 
     Ok(MediaMetadata {
+      kind,
       channel: self.channel_name.clone(),
       id: detail.id.to_string(),
       name: detail.name,
@@ -95,13 +106,17 @@ impl MediaChannelExt for UnifiedMediaService {
 
     let items_with_detail = self.get_media_detail_by_ids(ids.as_slice()).await?;
 
+    let class = &items_with_detail.class.clone().unwrap_or(vec![]);
+
     let items = items_with_detail
       .list
       .iter()
       .map(|detail| {
         let release_year = detail.year.parse().unwrap_or(0);
+        let kind = detail.parse_media_kind(class);
 
         MediaMetadata {
+          kind,
           channel: self.channel_name.clone(),
           id: detail.id.to_string(),
           name: detail.name.clone(),
@@ -126,7 +141,11 @@ impl MediaChannelExt for UnifiedMediaService {
   }
 
   async fn get_media_playlist(&self, media_id: &str) -> anyhow::Result<crate::MediaPlaylist> {
-    let detail = self.get_media_detail(media_id).await?;
+    let response = self.get_media_detail(media_id).await?;
+    let detail = response
+      .list
+      .first()
+      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", media_id))?;
 
     let playlist: Vec<MediaPlaylistItem> = detail
       .play_url
@@ -153,14 +172,15 @@ impl MediaChannelExt for UnifiedMediaService {
 }
 
 impl UnifiedMediaService {
-  async fn get_media_detail(&self, id: &str) -> anyhow::Result<Detail> {
+  async fn get_media_detail(&self, id: &str) -> anyhow::Result<UnifiedAPIResponse<Detail>> {
     log::info!("Getting video detail of {:?}", id);
 
     let details = self.get_media_detail_by_ids(&[id]).await?;
 
-    let detail = details.list.first().unwrap();
-
-    Ok(detail.clone())
+    // let detail = details.list.first().unwrap();
+    //
+    // Ok(detail.clone())
+    Ok(details)
   }
 
   async fn get_media_detail_by_ids<T: AsRef<str>>(

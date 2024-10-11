@@ -1,4 +1,5 @@
 use reqwest::Client;
+use protocol::channel::MediaKind;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -181,6 +182,31 @@ impl UnifiedAPI {
       http_version: http::Version::HTTP_11
     }
   }
+}
+
+impl Detail {
+  pub fn parse_media_kind(&self, class: &[TypeItem]) -> MediaKind {
+    parse_root_type(class, self.type_id)
+  }
+}
+
+fn parse_root_type(class: &[TypeItem], type_id: u32) -> MediaKind {
+  if let Some(c) = class.iter().find(|c| c.type_id == type_id) {
+
+    if c.type_pid != 0 {
+      return parse_root_type(class, c.type_pid);
+    }
+
+    match c.type_name.as_str() {
+      "电影" => return MediaKind::Movie,
+      "电视剧" => return MediaKind::TV,
+      "综艺" => return MediaKind::Variety,
+      "动漫" => return  MediaKind::Anime,
+      _ => return MediaKind::Other,
+    }
+  }
+
+  MediaKind::Other
 }
 
 impl From<StringOrNumber> for u32 {

@@ -1,15 +1,13 @@
 mod error;
 mod models;
 
-use std::ops::Deref;
-
 pub use error::DatabaseError;
 pub use models::*;
-
-pub type DatabaseResult<T> = Result<T, DatabaseError>;
-
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
+use std::ops::Deref;
+
+pub type DatabaseResult<T> = Result<T, DatabaseError>;
 
 #[derive(Clone)]
 pub struct ConnectionPool(pub(crate) PgPool);

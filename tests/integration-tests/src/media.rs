@@ -1,7 +1,7 @@
 use crate::common::setup_testing;
 use crate::response_to_json;
 use axum::http::StatusCode;
-use protocol::channel::MediaMetadata;
+use protocol::channel::{MediaKind, MediaMetadata};
 use testing::request::Request;
 
 #[tokio::test]
@@ -23,6 +23,7 @@ async fn test_get_media_metadata_by_huaweiba() -> anyhow::Result<()> {
   assert_eq!(response.id, media_id.to_string());
   assert_eq!(response.name, "琅琊榜");
   assert_eq!(response.release_year, 2015);
+  assert_eq!(response.kind, MediaKind::TV);
 
   Ok(())
 }

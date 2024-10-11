@@ -3,7 +3,7 @@ use m3u8_rs::{parse_playlist_res, MediaPlaylist, Playlist};
 use protocol::{DownloadProgressExt, DownloadProgressReceiver, DownloadProgressStream};
 use reqwest::Client;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::str::FromStr;
 use std::sync::Arc;
 use tokio::fs;
