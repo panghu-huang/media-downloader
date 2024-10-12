@@ -47,6 +47,7 @@ async fn test_get_media_metadata_by_heimuer() -> anyhow::Result<()> {
   assert_eq!(response.id, media_id.to_string());
   assert_eq!(response.name, "海贼王");
   assert_eq!(response.release_year, 1999);
+  assert_eq!(response.kind, MediaKind::Anime);
 
   Ok(())
 }

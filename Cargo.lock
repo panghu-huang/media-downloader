@@ -390,6 +390,7 @@ dependencies = [
  "http 1.1.0",
  "log",
  "m3u8-rs",
+ "parking_lot",
  "protocol",
  "regex",
  "reqwest",

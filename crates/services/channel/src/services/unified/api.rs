@@ -184,13 +184,7 @@ impl UnifiedAPI {
   }
 }
 
-impl Detail {
-  pub fn parse_media_kind(&self, class: &[TypeItem]) -> MediaKind {
-    parse_root_type(class, self.type_id)
-  }
-}
-
-fn parse_root_type(class: &[TypeItem], type_id: u32) -> MediaKind {
+pub fn parse_root_type(class: &[TypeItem], type_id: u32) -> MediaKind {
   if let Some(c) = class.iter().find(|c| c.type_id == type_id) {
 
     if c.type_pid != 0 {

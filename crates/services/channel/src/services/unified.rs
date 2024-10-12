@@ -1,9 +1,13 @@
 mod api;
 
-use self::api::{Detail, ListRequest, Response as UnifiedAPIResponse, UnifiedAPI};
+use self::api::{
+  parse_root_type, Detail, ListRequest, Response as UnifiedAPIResponse, TypeItem, UnifiedAPI,
+};
 use crate::services::DownloadMediaOptions;
 use crate::services::MediaChannelExt;
 use configuration::UnifiedItemConfig;
+use parking_lot::Mutex;
+use protocol::channel::MediaKind;
 use protocol::channel::MediaMetadata;
 use protocol::channel::{MediaPlaylist, MediaPlaylistItem};
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
@@ -12,6 +16,7 @@ use protocol::DownloadProgressReceiver;
 pub struct UnifiedMediaService {
   api: UnifiedAPI,
   channel_name: String,
+  types: Mutex<Vec<TypeItem>>,
 }
 
 #[async_trait::async_trait]
@@ -24,11 +29,7 @@ impl MediaChannelExt for UnifiedMediaService {
     &self,
     options: DownloadMediaOptions,
   ) -> anyhow::Result<DownloadProgressReceiver> {
-    let response = self.get_media_detail(&options.media_id).await?;
-    let detail = response
-      .list
-      .first()
-      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", options.media_id))?;
+    let detail = self.get_media_detail(&options.media_id).await?;
 
     let mut play_url_list = detail.play_url.split('#');
 
@@ -63,15 +64,13 @@ impl MediaChannelExt for UnifiedMediaService {
   }
 
   async fn get_media_metadata(&self, media_id: &str) -> anyhow::Result<MediaMetadata> {
-    let response = self.get_media_detail(media_id).await?;
-    let detail = response
-      .list
-      .first()
-      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", media_id))?
-      .clone();
+    let detail = self.get_media_detail(media_id).await?;
+
+    self.ensure_types().await.ok();
 
     let release_year = detail.year.parse().unwrap_or(0);
-    let kind = detail.parse_media_kind(&response.class.clone().unwrap_or(vec![]));
+
+    let kind = self.parse_media_kind(detail.type_id);
 
     Ok(MediaMetadata {
       kind,
@@ -98,6 +97,8 @@ impl MediaChannelExt for UnifiedMediaService {
 
     let search_result = self.api.list(&request).await?;
 
+    self.ensure_types().await.ok();
+
     let ids = search_result
       .list
       .iter()
@@ -106,14 +107,12 @@ impl MediaChannelExt for UnifiedMediaService {
 
     let items_with_detail = self.get_media_detail_by_ids(ids.as_slice()).await?;
 
-    let class = &items_with_detail.class.clone().unwrap_or(vec![]);
-
     let items = items_with_detail
       .list
       .iter()
       .map(|detail| {
         let release_year = detail.year.parse().unwrap_or(0);
-        let kind = detail.parse_media_kind(class);
+        let kind = self.parse_media_kind(detail.type_id);
 
         MediaMetadata {
           kind,
@@ -141,11 +140,7 @@ impl MediaChannelExt for UnifiedMediaService {
   }
 
   async fn get_media_playlist(&self, media_id: &str) -> anyhow::Result<crate::MediaPlaylist> {
-    let response = self.get_media_detail(media_id).await?;
-    let detail = response
-      .list
-      .first()
-      .ok_or_else(|| anyhow::anyhow!("No detail found for media ID: {}", media_id))?;
+    let detail = self.get_media_detail(media_id).await?;
 
     let playlist: Vec<MediaPlaylistItem> = detail
       .play_url
@@ -172,15 +167,14 @@ impl MediaChannelExt for UnifiedMediaService {
 }
 
 impl UnifiedMediaService {
-  async fn get_media_detail(&self, id: &str) -> anyhow::Result<UnifiedAPIResponse<Detail>> {
+  async fn get_media_detail(&self, id: &str) -> anyhow::Result<Detail> {
     log::info!("Getting video detail of {:?}", id);
 
     let details = self.get_media_detail_by_ids(&[id]).await?;
 
-    // let detail = details.list.first().unwrap();
-    //
-    // Ok(detail.clone())
-    Ok(details)
+    let detail = details.list.first().unwrap();
+
+    Ok(detail.clone())
   }
 
   async fn get_media_detail_by_ids<T: AsRef<str>>(
@@ -195,6 +189,31 @@ impl UnifiedMediaService {
     }
 
     Ok(details)
+  }
+
+  fn parse_media_kind(&self, type_id: u32) -> MediaKind {
+    let types = self.types.lock();
+
+    parse_root_type(&types, type_id)
+  }
+
+  async fn ensure_types(&self) -> anyhow::Result<()> {
+    let is_empty = self.types.lock().is_empty();
+
+    if is_empty {
+      let res = self
+        .api
+        .list(&ListRequest {
+          page: 1,
+          keyword: None,
+          type_id: None,
+        })
+        .await?;
+
+      *self.types.lock() = res.class.unwrap();
+    }
+
+    Ok(())
   }
 }
 
@@ -211,6 +230,7 @@ impl UnifiedMediaService {
     Self {
       channel_name: channel_name.to_owned(),
       api,
+      types: Mutex::new(vec![]),
     }
   }
 }

@@ -4,7 +4,7 @@ use gateway::Gateway;
 use models::ConnectionPool;
 use rpc_client::RpcClient;
 use testing::protocol::create_testing_channel;
-use tracing_subscriber::fmt::time::ChronoLocal;
+// use tracing_subscriber::fmt::time::ChronoLocal;
 
 #[macro_export]
 macro_rules! response_to_json {
@@ -18,11 +18,11 @@ macro_rules! response_to_json {
 }
 
 pub async fn setup_testing() -> Gateway {
-  tracing_subscriber::fmt()
-    .with_max_level(tracing::Level::INFO)
-    .with_timer(ChronoLocal::new("%Y-%m-%d %H:%M:%S%.3f".to_string()))
-    .init();
-
+  // tracing_subscriber::fmt()
+  //   .with_max_level(tracing::Level::INFO)
+  //   .with_timer(ChronoLocal::new("%Y-%m-%d %H:%M:%S%.3f".to_string()))
+  //   .init();
+  //
   let (client, server) = create_testing_channel().await;
 
   // Create a new configuration with the test environment.
