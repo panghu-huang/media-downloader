@@ -39,6 +39,12 @@ pub struct MediaMetadata {
   pub kind: MediaKind,
 }
 
+impl MediaMetadata {
+  pub fn is_movie(&self) -> bool {
+    self.kind == MediaKind::Movie
+  }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GetMediaPlaylistRequest {
   pub channel: String,

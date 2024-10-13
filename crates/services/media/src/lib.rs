@@ -135,7 +135,11 @@ impl MediaExt for MediaService {
           )
           .await
           .and_then(|local_path| {
-            Self::rename_media_file(metadata.clone(), &media_dir, start_number, &local_path)
+            if metadata.is_movie() {
+              Self::rename_movie_file(metadata.clone(), &media_dir, &local_path)
+            } else {
+              Self::rename_media_file(metadata.clone(), &media_dir, start_number, &local_path)
+            }
           }) {
             log::info!(
               "Failed to download media {}(#{:?}): {}",
@@ -192,6 +196,35 @@ impl MediaService {
     }
 
     anyhow::bail!("No done event received")
+  }
+
+  fn rename_movie_file(
+    metadata: MediaMetadata,
+    media_dir: &Path,
+    local_path: &Path,
+  ) -> anyhow::Result<()> {
+    let ext = local_path
+      .extension()
+      .ok_or(anyhow::anyhow!("Failed to parse extension from local path"))?
+      .to_string_lossy()
+      .to_string();
+
+    let base_dir_name = format!("{} ({})", metadata.name, metadata.release_year);
+    let file_name = format!("{} ({}).{}", metadata.name, metadata.release_year, ext);
+
+    let new_local_path = media_dir.join(base_dir_name).join(file_name);
+
+    log::info!(
+      "Rename file from {} to {}",
+      local_path.to_string_lossy().to_string(),
+      new_local_path.to_string_lossy().to_string()
+    );
+
+    std::fs::create_dir_all(new_local_path.parent().unwrap())?;
+
+    std::fs::rename(local_path, new_local_path)?;
+
+    Ok(())
   }
 
   fn rename_media_file(
