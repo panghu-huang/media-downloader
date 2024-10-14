@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": false,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "importHelpers": false,
+    "noUnusedLocals": false,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "lib": [
+      "es6",
+      "dom",
+      "ES2021"
+    ],
+    "jsx": "react",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2017",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".vscode"
+  ]
+}
