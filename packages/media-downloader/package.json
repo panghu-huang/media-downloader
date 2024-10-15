@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "coodev-react"
+    "dev": "npm-run-all --parallel coodev-react tailwind",
+    "coodev-react": "coodev-react",
+    "tailwind": "tailwindcss -i ./src/styles/globals.css -o ./public/globals.css --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@coodev/react": "1.0.0-dev.26",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
+    "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.452.0",
@@ -23,6 +28,7 @@
   "devDependencies": {
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
+    "npm-run-all": "^4.1.5",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.3"
   }
