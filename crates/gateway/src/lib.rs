@@ -51,6 +51,10 @@ impl Gateway {
         "/channels/:channel_name/media/:media_id",
         get(media::get_media_metadata),
       )
+      .route(
+        "/channels/:channel_name/media/:media_id/playlist",
+        get(media::get_media_playlist),
+      )
       .route("/media/download", post(media::download_media))
       .route("/media/batch_download", post(media::batch_download_media))
       .route("/media/search", get(media::search_media))

@@ -4,6 +4,7 @@ use axum::http::StatusCode;
 use protocol::media::BatchDownloadMediaRequest;
 use protocol::media::DownloadMediaRequest;
 use protocol::media::{GetMediaMetadataRequest, MediaMetadata};
+use protocol::media::{GetMediaPlaylistRequest, MediaPlaylist};
 use protocol::media::{SearchMediaRequest, SearchMediaResponse};
 
 #[derive(serde::Deserialize)]
@@ -68,6 +69,21 @@ pub async fn search_media(
   };
 
   let res = media_client.search_media(request).await?.into_inner();
+
+  Ok(Json(res))
+}
+
+/// Handler for `GET /api/v1/channels/:channel_name/media/:media_id/playlist`
+pub async fn get_media_playlist(
+  RpcClient(rpc_client): RpcClient,
+  Path((channel, media_id)): Path<(String, String)>,
+) -> crate::Result<Json<MediaPlaylist>> {
+  let mut media_client = rpc_client.media.clone();
+
+  let res = media_client
+    .get_media_playlist(GetMediaPlaylistRequest { channel, media_id })
+    .await?
+    .into_inner();
 
   Ok(Json(res))
 }
