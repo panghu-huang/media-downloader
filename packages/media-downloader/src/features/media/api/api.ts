@@ -9,7 +9,18 @@ export interface SearchMediaOptions {
 
 export type SearchMediaResponse = ListResponse<MediaMetadata>
 
-export type MediaPlaylistResponse = ListResponse<MediaPlaylistItem>
+export interface MediaPlaylistResponse {
+  channel: string
+  media_id: string
+  items: MediaPlaylistItem[]
+}
+
+export interface BatchDownloadOptions {
+  channel: string
+  media_id: string
+  start_number: number
+  count: number
+}
 
 class MediaAPI extends APIClient {
   public async search(options: SearchMediaOptions) {
@@ -32,6 +43,16 @@ class MediaAPI extends APIClient {
   public async getPlaylist(channel: string, id: string) {
     const res = await this.request<MediaPlaylistResponse>({
       url: `/channels/${channel}/media/${id}/playlist`,
+    })
+
+    return res
+  }
+
+  public async batchDownload(options: BatchDownloadOptions) {
+    const res = await this.request<string>({
+      url: '/media/batch_download',
+      data: options,
+      method: 'POST',
     })
 
     return res
