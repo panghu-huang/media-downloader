@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-node ./web/server.js &
+pnpm --filter media-downloader run start &
 
 ./media-downloader
