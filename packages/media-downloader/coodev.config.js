@@ -6,12 +6,11 @@ if (nodeEnv === 'development') {
   require('dotenv').config()
 }
 
-const defaultAPIUrl = 'http://192.168.2.105:5231/api/v1'
-
 module.exports = {
   srcDir: './src',
   runtimeConfig: {
-    apiBaseURL: process.env.API_BASE_URL || defaultAPIUrl,
+    apiBaseURL: process.env.API_BASE_URL,
+    apiBaseURLServer: process.env.API_BASE_URL_SERVER,
   },
   plugins: [
     {
