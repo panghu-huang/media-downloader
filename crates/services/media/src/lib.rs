@@ -209,10 +209,9 @@ impl MediaService {
       .to_string_lossy()
       .to_string();
 
-    let base_dir_name = format!("{} ({})", metadata.name, metadata.release_year);
     let file_name = format!("{} ({}).{}", metadata.name, metadata.release_year, ext);
 
-    let new_local_path = media_dir.join(base_dir_name).join(file_name);
+    let new_local_path = media_dir.join("movies").join(file_name);
 
     log::info!(
       "Rename file from {} to {}",
@@ -222,7 +221,7 @@ impl MediaService {
 
     std::fs::create_dir_all(new_local_path.parent().unwrap())?;
 
-    std::fs::rename(local_path, new_local_path)?;
+    std::fs::copy(local_path, new_local_path)?;
 
     Ok(())
   }
@@ -244,6 +243,7 @@ impl MediaService {
     let file_name = format!("{} S{}E{}.{}", metadata.name, "01", episode_number, ext);
 
     let new_local_path = media_dir
+      .join("tv_shows")
       .join(base_dir_name)
       .join(season_dir_name)
       .join(file_name);
@@ -256,7 +256,7 @@ impl MediaService {
 
     std::fs::create_dir_all(new_local_path.parent().unwrap())?;
 
-    std::fs::rename(local_path, new_local_path)?;
+    std::fs::copy(local_path, new_local_path)?;
 
     Ok(())
   }
