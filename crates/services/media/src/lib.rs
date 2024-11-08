@@ -1,3 +1,5 @@
+mod utils;
+
 use models::ConnectionPool;
 use protocol::media::BatchDownloadMediaRequest;
 use protocol::media::DownloadMediaRequest;
@@ -10,6 +12,7 @@ use rpc_client::RpcClient;
 use std::ops::AddAssign;
 use std::path::Path;
 use std::path::PathBuf;
+use utils::rename_file;
 
 pub struct MediaService {
   media_dir: PathBuf,
@@ -219,9 +222,7 @@ impl MediaService {
       new_local_path.to_string_lossy().to_string()
     );
 
-    std::fs::create_dir_all(new_local_path.parent().unwrap())?;
-
-    std::fs::copy(local_path, new_local_path)?;
+    rename_file(local_path, new_local_path)?;
 
     Ok(())
   }
@@ -254,9 +255,7 @@ impl MediaService {
       new_local_path.to_string_lossy().to_string()
     );
 
-    std::fs::create_dir_all(new_local_path.parent().unwrap())?;
-
-    std::fs::copy(local_path, new_local_path)?;
+    rename_file(local_path, new_local_path)?;
 
     Ok(())
   }
