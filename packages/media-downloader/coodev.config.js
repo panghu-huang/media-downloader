@@ -10,7 +10,7 @@ module.exports = {
   srcDir: './src',
   runtimeConfig: {
     apiBaseURL: process.env.API_BASE_URL,
-    apiBaseURLServer: process.env.API_BASE_URL_SERVER,
+    apiBaseURLServer: process.env.API_BASE_URL_SERVER || process.env.API_BASE_URL
   },
   plugins: [
     {

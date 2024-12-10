@@ -12,7 +12,6 @@ RUN cargo build -p gateway --release
 
 FROM node:20.15.1
 
-ENV NODE_ENV=production
 WORKDIR /home/working
 
 RUN npm install -g pnpm@9.5.0
@@ -24,6 +23,9 @@ COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
 COPY ./packages ./packages
 
 RUN pnpm install
+
+ENV NODE_ENV=production
+
 RUN pnpm --filter media-downloader run build
 
 COPY --from=rust_builder /home/working/target/release/gateway ./media-downloader

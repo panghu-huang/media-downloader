@@ -8,6 +8,7 @@ import {
   mediaAPI,
 } from '@/features/media'
 import { useSelection } from '@/hooks/use-selection'
+import { SearchInput } from '@/components/search-input'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 
@@ -51,7 +52,10 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4">
+      <div className='pb-4'>
+        <SearchInput />
+      </div>
       <Metadata metadata={metadata} />
       <Separator className="mt-4 mb-4" />
       <Playlist playlist={playlist} start={start} end={end} onToggle={toggle} />

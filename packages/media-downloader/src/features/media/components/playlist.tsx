@@ -25,7 +25,10 @@ const Playlist: React.FC<PlaylistProps> = ({
 }) => {
   return (
     <div className="media-playlist">
-      {playlist.map(item => {
+      {playlist.map((item, index) => {
+        const prefix = String(index + 1)
+        const text = String(item.text).trim()
+
         return (
           <Toggle
             key={item.number}
@@ -34,7 +37,7 @@ const Playlist: React.FC<PlaylistProps> = ({
             pressed={isSelected(item.number, start, end)}
             onClick={() => onToggle(item.number)}
           >
-            {item.text}
+            {prefix === text ? text : `${prefix} (${text})`}
           </Toggle>
         )
       })}
