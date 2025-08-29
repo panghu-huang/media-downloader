@@ -1,6 +1,6 @@
 mod utils;
 
-use models::ConnectionPool;
+// use models::ConnectionPool;
 use protocol::media::BatchDownloadMediaRequest;
 use protocol::media::DownloadMediaRequest;
 use protocol::media::MediaExt;
@@ -17,7 +17,7 @@ use utils::rename_file;
 pub struct MediaService {
   media_dir: PathBuf,
   rpc_client: RpcClient,
-  connection_pool: ConnectionPool,
+  // connection_pool: ConnectionPool,
 }
 
 #[async_trait]
@@ -262,11 +262,11 @@ impl MediaService {
 }
 
 impl MediaService {
-  pub fn new(rpc_client: &RpcClient, connection_pool: &ConnectionPool) -> Self {
+  pub fn new(rpc_client: &RpcClient) -> Self {
     Self {
       media_dir: media_dir(),
       rpc_client: rpc_client.clone(),
-      connection_pool: connection_pool.clone(),
+      // connection_pool: connection_pool.clone(),
     }
   }
 }

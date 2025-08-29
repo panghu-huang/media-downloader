@@ -1,7 +1,7 @@
 use aggregation::create_aggregation_service;
 use configuration::Configuration;
 use gateway::Gateway;
-use models::ConnectionPool;
+// use models::ConnectionPool;
 use rpc_client::RpcClient;
 use tracing_subscriber::fmt::time::ChronoLocal;
 
@@ -14,9 +14,9 @@ pub async fn main() -> anyhow::Result<()> {
 
   let config = Configuration::new()?;
   let client = RpcClient::try_from(&config)?;
-  let connection_pool = ConnectionPool::connect(&config.database.url).await?;
+  // let connection_pool = ConnectionPool::connect(&config.database.url).await?;
 
-  let aggregation = create_aggregation_service(&config, &connection_pool, &client);
+  let aggregation = create_aggregation_service(&config, &client);
 
   let gateway = Gateway::new(client, config.clone());
 

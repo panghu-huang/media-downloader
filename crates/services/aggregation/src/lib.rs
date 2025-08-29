@@ -1,7 +1,7 @@
 use channel::ChannelService;
 use configuration::Configuration;
 use media::MediaService;
-use models::ConnectionPool;
+// use models::ConnectionPool;
 use protocol::channel::ChannelServer;
 use protocol::media::MediaServer;
 use protocol::tonic::transport::server::Router;
@@ -44,11 +44,10 @@ impl AggregationService {
 
 pub fn create_aggregation_service(
   configuration: &Configuration,
-  pool: &ConnectionPool,
   rpc_client: &RpcClient,
 ) -> AggregationService {
   let channel = ChannelService::new(configuration);
-  let media = MediaService::new(rpc_client, pool);
+  let media = MediaService::new(rpc_client);
 
   AggregationService { channel, media }
 }

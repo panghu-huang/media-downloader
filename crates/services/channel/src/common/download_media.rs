@@ -176,7 +176,11 @@ async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
     .use_rustls_tls()
     .build()?;
 
-  let res = client.get(download_url).send().await?;
+  let res = client
+    .get(download_url)
+    .send()
+    .await
+    .map_err(|e| anyhow::anyhow!("Failed to send request: {}", e))?;
 
   let status = res.status();
   if !status.is_success() {
@@ -186,11 +190,16 @@ async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
     anyhow::bail!("Request failed with code {}", status);
   }
 
-  let bytes = res.bytes().await?.to_vec();
+  let bytes = res
+    .bytes()
+    .await
+    .map_err(|e| anyhow::anyhow!("Failed to read response: {}", e))?
+    .to_vec();
 
   let temp_dir = temporary_directory().await?;
 
-  let parsed_url = Url::from_str(download_url).unwrap();
+  let parsed_url = Url::from_str(download_url)
+    .map_err(|e| anyhow::anyhow!("Invalid url {}: {}", download_url, e))?;
 
   let path_segments = parsed_url
     .path_segments()
