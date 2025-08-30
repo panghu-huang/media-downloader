@@ -24,3 +24,4 @@ chrono = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 parking_lot = "0.12.3"
+async-recursion = { workspace = true }

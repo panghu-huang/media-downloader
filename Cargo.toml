@@ -49,6 +49,7 @@ url = "2.5.2"
 parking_lot = "0.12.3"
 ratatui = "0.28.0"
 crossterm = "0.28.1"
+async-recursion = "1.1.1"
 
 # Internal dependencies
 gateway = { path = "crates/gateway" }

@@ -1,5 +1,5 @@
 use crate::common::temporary_directory;
-use m3u8_rs::{parse_playlist_res, MediaPlaylist, Playlist};
+use m3u8_rs::{parse_playlist_res, MasterPlaylist, MediaPlaylist, Playlist};
 use protocol::{DownloadProgressExt, DownloadProgressReceiver, DownloadProgressStream};
 use reqwest::Client;
 use std::path::{Path, PathBuf};
@@ -8,7 +8,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use tokio::fs;
 use tokio::sync::Semaphore;
-use url::Url;
+use url::{Origin, Url};
 
 pub struct DownloadMediaOptions<'a> {
   pub download_url: &'a str,
@@ -146,7 +146,9 @@ async fn download_segments_of_playlist(
   Ok(playlist)
 }
 
+#[async_recursion::async_recursion]
 async fn fetch_media_playlist(download_url: &str) -> anyhow::Result<MediaPlaylist> {
+  log::info!("Starting fetch media playlist: {}", download_url);
   let client = Client::new();
 
   let res = client.get(download_url).send().await?;
@@ -159,22 +161,44 @@ async fn fetch_media_playlist(download_url: &str) -> anyhow::Result<MediaPlaylis
 
   let bytes = res.bytes().await?.to_vec();
   let parsed = parse_playlist_res(&bytes);
+  let origin = extract_origin_from_url(download_url)?;
 
   let playlist = match parsed {
-    Ok(Playlist::MediaPlaylist(playlist)) => playlist,
-    Ok(Playlist::MasterPlaylist(_)) => anyhow::bail!("Unsupported format"),
+    Ok(Playlist::MediaPlaylist(mut playlist)) => {
+      normalize_media_playlist(&mut playlist, &origin);
+
+      playlist
+    }
+    Ok(Playlist::MasterPlaylist(mut master_playlist)) => {
+      log::info!("Got master playlist: {:#?}", master_playlist);
+      normalize_master_playlist(&mut master_playlist, &origin);
+
+      parse_master_playlist(&mut master_playlist).await?
+    }
     Err(err) => anyhow::bail!("Fetch media playlist error: {}", err),
   };
 
   Ok(playlist)
 }
 
+async fn parse_master_playlist(
+  master_playlist: &mut MasterPlaylist,
+) -> anyhow::Result<MediaPlaylist> {
+  if let Some(new_variant_stream) = master_playlist.get_newest_variant() {
+    fetch_media_playlist(&new_variant_stream.uri).await
+  } else {
+    anyhow::bail!("Unsupported format")
+  }
+}
+
+// TODO: Provide a config for download segment
 async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
   let client = Client::builder()
-    .http2_adaptive_window(true)
-    .http2_prior_knowledge()
+    // .http2_adaptive_window(true)
+    // .http2_prior_knowledge()
     .use_rustls_tls()
-    .build()?;
+    .build()
+    .map_err(|err| anyhow::anyhow!("Failed to build reqwest: {:#?}", err))?;
 
   let res = client
     .get(download_url)
@@ -233,4 +257,33 @@ async fn transform_video(source: &Path, dest: &Path) -> anyhow::Result<()> {
   }
 
   Ok(())
+}
+
+fn normalize_media_playlist(media_playlist: &mut MediaPlaylist, origin: &str) {
+  for segment in &mut media_playlist.segments {
+    segment.uri = normalize_url(&segment.uri, origin);
+  }
+}
+
+fn normalize_master_playlist(master_playlist: &mut MasterPlaylist, origin: &str) {
+  for variant_stream in &mut master_playlist.variants {
+    variant_stream.uri = normalize_url(&variant_stream.uri, origin);
+  }
+}
+
+fn normalize_url(path_or_url: &str, origin: &str) -> String {
+  if path_or_url.starts_with("http") {
+    path_or_url.to_string()
+  } else {
+    format!("{}{}", origin, path_or_url)
+  }
+}
+
+fn extract_origin_from_url(url: &str) -> anyhow::Result<String> {
+  let parsed_url = Url::parse(url)?;
+  let Origin::Tuple(protocol, host, _port) = parsed_url.origin() else {
+    anyhow::bail!("Unsupported origin");
+  };
+
+  Ok(format!("{}://{}", protocol, host))
 }

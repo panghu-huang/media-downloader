@@ -126,10 +126,7 @@ impl MediaChannelExt for UnifiedMediaService {
       })
       .collect();
 
-    let page_size = search_result
-      .limit
-      .parse()
-      .map_err(|e| anyhow::anyhow!("Failed to parse limit as number: {}", e))?;
+    let page_size: u32 = search_result.limit.into();
 
     Ok(SearchMediaResponse {
       items,

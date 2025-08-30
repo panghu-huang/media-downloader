@@ -59,7 +59,7 @@ pub struct Response<T> {
   #[serde(rename = "pagecount")]
   pub page_count: u32,
   pub total: u32,
-  pub limit: String,
+  pub limit: StringOrNumber,
   pub list: Vec<T>,
   pub class: Option<Vec<TypeItem>>,
 }
