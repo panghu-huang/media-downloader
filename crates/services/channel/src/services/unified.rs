@@ -55,10 +55,9 @@ impl MediaChannelExt for UnifiedMediaService {
     let download_opts = crate::common::DownloadMediaOptions {
       download_url: m3u8_url,
       destination_path: &options.destination_path,
-      parallel_size: 8,
     };
 
-    let progress = crate::common::download_media(download_opts).await?;
+    let progress = crate::common::download_media_using_ffmpeg(download_opts).await?;
 
     Ok(progress)
   }

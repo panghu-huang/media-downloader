@@ -1,0 +1,330 @@
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/PK6QB6NZ.ts' for reading    
+2026-01-25 11:14:21.723  INFO media: Downloading ... 603/406    
+2026-01-25 11:14:22.210  INFO channel::common::download_media: ffmpeg: frame=25200 fps= 56 q=-1.0 size=  262912kB time=00:16:48.04 bitrate=2136.6kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/im75pNDE.ts' for reading    
+2026-01-25 11:14:23.200  INFO media: Downloading ... 604/406    
+2026-01-25 11:14:23.706  INFO media: Downloading ... 605/406    
+2026-01-25 11:14:23.783  INFO channel::common::download_media: ffmpeg: frame=25275 fps= 56 q=-1.0 size=  263424kB time=00:16:51.04 bitrate=2134.4kbits/s speed=2.23x    
+frame=25325 fps= 56 q=-1.0 size=  263936kB time=00:16:53.00 bitrate=2134.4kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/uMmIeGjm.ts' for reading    
+2026-01-25 11:14:24.461  INFO media: Downloading ... 606/406    
+2026-01-25 11:14:24.968  INFO media: Downloading ... 607/406    
+2026-01-25 11:14:24.998  INFO channel::common::download_media: ffmpeg: frame=25350 fps= 56 q=-1.0 size=  264448kB time=00:16:54.06 bitrate=2136.3kbits/s speed=2.23x    
+frame=25406 fps= 56 q=-1.0 size=  264960kB time=00:16:56.24 bitrate=2135.9kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/mv3iIr3X.ts' for reading    
+2026-01-25 11:14:25.676  INFO media: Downloading ... 608/406    
+2026-01-25 11:14:26.181  INFO media: Downloading ... 609/406    
+2026-01-25 11:14:26.197  INFO channel::common::download_media: ffmpeg: frame=25425 fps= 56 q=-1.0 size=  265216kB time=00:16:57.05 bitrate=2136.2kbits/s speed=2.23x    
+frame=25487 fps= 56 q=-1.0 size=  265984kB time=00:16:59.48 bitrate=2137.3kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/FDx0a9tU.ts' for reading    
+2026-01-25 11:14:26.851  INFO media: Downloading ... 610/406    
+2026-01-25 11:14:27.309  INFO channel::common::download_media: ffmpeg: frame=25500 fps= 56 q=-1.0 size=  265984kB time=00:17:00.05 bitrate=2136.1kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/cEoJmI4N.ts' for reading    
+2026-01-25 11:14:28.081  INFO media: Downloading ... 611/406    
+2026-01-25 11:14:28.425  INFO channel::common::download_media: ffmpeg: frame=25575 fps= 56 q=-1.0 size=  266496kB time=00:17:03.04 bitrate=2134.0kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/1p1DTC20.ts' for reading    
+2026-01-25 11:14:29.294  INFO media: Downloading ... 612/406    
+2026-01-25 11:14:29.599  INFO channel::common::download_media: ffmpeg: frame=25650 fps= 56 q=-1.0 size=  267008kB time=00:17:06.04 bitrate=2131.8kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/w3fpkvsq.ts' for reading    
+2026-01-25 11:14:30.389  INFO media: Downloading ... 613/406    
+2026-01-25 11:14:30.766  INFO media: Downloading ... 614/406    
+2026-01-25 11:14:30.810  INFO channel::common::download_media: ffmpeg: frame=25725 fps= 56 q=-1.0 size=  267776kB time=00:17:09.06 bitrate=2131.7kbits/s speed=2.24x    
+frame=25765 fps= 56 q=-1.0 size=  268288kB time=00:17:10.60 bitrate=2132.6kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/FIzMIar4.ts' for reading    
+2026-01-25 11:14:32.163  INFO media: Downloading ... 615/406    
+2026-01-25 11:14:32.513  INFO media: Downloading ... 616/406    
+2026-01-25 11:14:32.536  INFO channel::common::download_media: ffmpeg: frame=25800 fps= 56 q=-1.0 size=  268544kB time=00:17:12.05 bitrate=2131.6kbits/s speed=2.23x    
+frame=25858 fps= 56 q=-1.0 size=  269056kB time=00:17:14.32 bitrate=2131.0kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/SvmFwkVh.ts' for reading    
+2026-01-25 11:14:33.361  INFO media: Downloading ... 617/406    
+2026-01-25 11:14:33.656  INFO channel::common::download_media: ffmpeg: frame=25875 fps= 56 q=-1.0 size=  269312kB time=00:17:15.05 bitrate=2131.5kbits/s speed=2.23x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/FYchfxuc.ts' for reading    
+2026-01-25 11:14:34.514  INFO media: Downloading ... 618/406    
+2026-01-25 11:14:34.782  INFO channel::common::download_media: ffmpeg: frame=25950 fps= 56 q=-1.0 size=  269824kB time=00:17:18.04 bitrate=2129.4kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/rpPsroyA.ts' for reading    
+2026-01-25 11:14:35.586  INFO media: Downloading ... 619/406    
+2026-01-25 11:14:35.894  INFO channel::common::download_media: ffmpeg: frame=26025 fps= 56 q=-1.0 size=  270336kB time=00:17:21.04 bitrate=2127.3kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Z19I5h4q.ts' for reading    
+2026-01-25 11:14:37.022  INFO media: Downloading ... 620/406    
+2026-01-25 11:14:37.385  INFO channel::common::download_media: ffmpeg: frame=26100 fps= 56 q=-1.0 size=  270848kB time=00:17:24.06 bitrate=2125.1kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/sfJ1dQQS.ts' for reading    
+2026-01-25 11:14:38.221  INFO media: Downloading ... 621/406    
+2026-01-25 11:14:38.540  INFO media: Downloading ... 622/406    
+2026-01-25 11:14:38.542  INFO channel::common::download_media: ffmpeg: frame=26175 fps= 56 q=-1.0 size=  271360kB time=00:17:27.05 bitrate=2123.1kbits/s speed=2.24x    
+frame=26248 fps= 56 q=-1.0 size=  271872kB time=00:17:29.92 bitrate=2121.3kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/H84KKfnu.ts' for reading    
+2026-01-25 11:14:39.350  INFO media: Downloading ... 623/406    
+2026-01-25 11:14:39.728  INFO media: Downloading ... 624/406    
+2026-01-25 11:14:39.753  INFO channel::common::download_media: ffmpeg: frame=26250 fps= 56 q=-1.0 size=  271872kB time=00:17:30.05 bitrate=2121.0kbits/s speed=2.24x    
+frame=26304 fps= 56 q=-1.0 size=  272640kB time=00:17:32.16 bitrate=2122.7kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Al0aIPOh.ts' for reading    
+2026-01-25 11:14:40.563  INFO media: Downloading ... 625/406    
+2026-01-25 11:14:40.911  INFO channel::common::download_media: ffmpeg: frame=26325 fps= 56 q=-1.0 size=  272896kB time=00:17:33.04 bitrate=2122.9kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/RGzo6Xmx.ts' for reading    
+2026-01-25 11:14:41.799  INFO media: Downloading ... 626/406    
+2026-01-25 11:14:42.074  INFO media: Downloading ... 627/406    
+2026-01-25 11:14:42.108  INFO channel::common::download_media: ffmpeg: frame=26400 fps= 56 q=-1.0 size=  273408kB time=00:17:36.04 bitrate=2120.9kbits/s speed=2.24x    
+frame=26458 fps= 56 q=-1.0 size=  273920kB time=00:17:38.32 bitrate=2120.3kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/2n020ABu.ts' for reading    
+2026-01-25 11:14:42.916  INFO media: Downloading ... 628/406    
+2026-01-25 11:14:43.270  INFO channel::common::download_media: ffmpeg: frame=26475 fps= 56 q=-1.0 size=  274176kB time=00:17:39.06 bitrate=2120.8kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/rQ87WsKo.ts' for reading    
+2026-01-25 11:14:44.136  INFO media: Downloading ... 629/406    
+2026-01-25 11:14:44.403  INFO channel::common::download_media: ffmpeg: frame=26550 fps= 56 q=-1.0 size=  274944kB time=00:17:42.05 bitrate=2120.7kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/gkxInOgn.ts' for reading    
+2026-01-25 11:14:45.308  INFO media: Downloading ... 630/406    
+2026-01-25 11:14:45.616  INFO channel::common::download_media: ffmpeg: frame=26625 fps= 56 q=-1.0 size=  275456kB time=00:17:45.05 bitrate=2118.7kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/lcnWVQWT.ts' for reading    
+2026-01-25 11:14:46.484  INFO media: Downloading ... 631/406    
+2026-01-25 11:14:46.857  INFO media: Downloading ... 632/406    
+2026-01-25 11:14:46.867  INFO channel::common::download_media: ffmpeg: frame=26700 fps= 56 q=-1.0 size=  275968kB time=00:17:48.04 bitrate=2116.7kbits/s speed=2.24x    
+frame=26761 fps= 56 q=-1.0 size=  276224kB time=00:17:50.44 bitrate=2113.9kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Z7wbpfdW.ts' for reading    
+2026-01-25 11:14:47.781  INFO media: Downloading ... 633/406    
+2026-01-25 11:14:48.083  INFO channel::common::download_media: ffmpeg: frame=26775 fps= 56 q=-1.0 size=  276480kB time=00:17:51.04 bitrate=2114.7kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/ILQfCpRd.ts' for reading    
+2026-01-25 11:14:48.984  INFO media: Downloading ... 634/406    
+2026-01-25 11:14:49.262  INFO channel::common::download_media: ffmpeg: frame=26850 fps= 56 q=-1.0 size=  276992kB time=00:17:54.06 bitrate=2112.7kbits/s speed=2.24x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/DJxgApK3.ts' for reading    
+2026-01-25 11:14:50.104  INFO media: Downloading ... 635/406    
+2026-01-25 11:14:50.514  INFO media: Downloading ... 636/406    
+2026-01-25 11:14:50.538  INFO channel::common::download_media: ffmpeg: frame=26925 fps= 56 q=-1.0 size=  277504kB time=00:17:57.05 bitrate=2110.7kbits/s speed=2.24x    
+frame=26987 fps= 56 q=-1.0 size=  278272kB time=00:17:59.48 bitrate=2111.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/y7whX0RD.ts' for reading    
+2026-01-25 11:14:51.381  INFO media: Downloading ... 637/406    
+2026-01-25 11:14:51.777  INFO media: Downloading ... 638/406    
+2026-01-25 11:14:51.785  INFO channel::common::download_media: ffmpeg: frame=27000 fps= 56 q=-1.0 size=  278272kB time=00:18:00.05 bitrate=2110.6kbits/s speed=2.24x    
+frame=27065 fps= 56 q=-1.0 size=  279040kB time=00:18:02.60 bitrate=2111.5kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/qDFa2Ais.ts' for reading    
+2026-01-25 11:14:52.672  INFO media: Downloading ... 639/406    
+2026-01-25 11:14:53.003  INFO media: Downloading ... 640/406    
+2026-01-25 11:14:53.009  INFO channel::common::download_media: ffmpeg: frame=27075 fps= 56 q=-1.0 size=  279040kB time=00:18:03.04 bitrate=2110.6kbits/s speed=2.25x    
+frame=27143 fps= 56 q=-1.0 size=  279552kB time=00:18:05.72 bitrate=2109.3kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/s2rvbQiw.ts' for reading    
+2026-01-25 11:14:53.731  INFO media: Downloading ... 641/406    
+2026-01-25 11:14:54.141  INFO channel::common::download_media: ffmpeg: frame=27150 fps= 56 q=-1.0 size=  279552kB time=00:18:06.04 bitrate=2108.7kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Z6DSEGwJ.ts' for reading    
+2026-01-25 11:14:54.976  INFO media: Downloading ... 642/406    
+2026-01-25 11:14:55.270  INFO channel::common::download_media: ffmpeg: frame=27225 fps= 56 q=-1.0 size=  280064kB time=00:18:09.06 bitrate=2106.7kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/C5fZwIuH.ts' for reading    
+2026-01-25 11:14:56.185  INFO media: Downloading ... 643/406    
+2026-01-25 11:14:56.481  INFO channel::common::download_media: ffmpeg: frame=27300 fps= 56 q=-1.0 size=  280320kB time=00:18:12.05 bitrate=2102.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/uD86LWs4.ts' for reading    
+2026-01-25 11:14:57.572  INFO media: Downloading ... 644/406    
+2026-01-25 11:14:57.884  INFO media: Downloading ... 645/406    
+2026-01-25 11:14:57.926  INFO channel::common::download_media: ffmpeg: frame=27375 fps= 56 q=-1.0 size=  280832kB time=00:18:15.05 bitrate=2100.9kbits/s speed=2.25x    
+frame=27424 fps= 56 q=-1.0 size=  281344kB time=00:18:16.96 bitrate=2101.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/5vgIe3G4.ts' for reading    
+2026-01-25 11:14:58.823  INFO media: Downloading ... 646/406    
+2026-01-25 11:14:59.156  INFO media: Downloading ... 647/406    
+2026-01-25 11:14:59.262  INFO channel::common::download_media: ffmpeg: frame=27450 fps= 56 q=-1.0 size=  281344kB time=00:18:18.04 bitrate=2099.0kbits/s speed=2.25x    
+frame=27491 fps= 56 q=-1.0 size=  281856kB time=00:18:19.64 bitrate=2099.7kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/8Vxb0sJk.ts' for reading    
+2026-01-25 11:15:00.151  INFO media: Downloading ... 648/406    
+2026-01-25 11:15:00.476  INFO media: Downloading ... 649/406    
+2026-01-25 11:15:00.589  INFO channel::common::download_media: ffmpeg: frame=27525 fps= 56 q=-1.0 size=  282368kB time=00:18:21.04 bitrate=2100.9kbits/s speed=2.25x    
+frame=27564 fps= 56 q=-1.0 size=  282880kB time=00:18:22.56 bitrate=2101.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/BIKJUA4a.ts' for reading    
+2026-01-25 11:15:01.475  INFO media: Downloading ... 650/406    
+2026-01-25 11:15:01.808  INFO media: Downloading ... 651/406    
+2026-01-25 11:15:01.912  INFO channel::common::download_media: ffmpeg: frame=27600 fps= 56 q=-1.0 size=  283392kB time=00:18:24.06 bitrate=2102.7kbits/s speed=2.25x    
+frame=27648 fps= 56 q=-1.0 size=  283904kB time=00:18:25.92 bitrate=2103.0kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Z02kD6oL.ts' for reading    
+2026-01-25 11:15:02.868  INFO media: Downloading ... 652/406    
+2026-01-25 11:15:03.172  INFO media: Downloading ... 653/406    
+2026-01-25 11:15:03.243  INFO channel::common::download_media: ffmpeg: frame=27675 fps= 56 q=-1.0 size=  284160kB time=00:18:27.05 bitrate=2102.7kbits/s speed=2.25x    
+frame=27721 fps= 56 q=-1.0 size=  284672kB time=00:18:28.84 bitrate=2103.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/QYFCegT3.ts' for reading    
+2026-01-25 11:15:04.156  INFO media: Downloading ... 654/406    
+2026-01-25 11:15:04.486  INFO media: Downloading ... 655/406    
+2026-01-25 11:15:04.567  INFO channel::common::download_media: ffmpeg: frame=27750 fps= 56 q=-1.0 size=  285184kB time=00:18:30.05 bitrate=2104.6kbits/s speed=2.25x    
+frame=27795 fps= 56 q=-1.0 size=  285696kB time=00:18:31.80 bitrate=2105.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/UKMOoSUl.ts' for reading    
+2026-01-25 11:15:05.487  INFO media: Downloading ... 656/406    
+2026-01-25 11:15:05.830  INFO media: Downloading ... 657/406    
+2026-01-25 11:15:05.866  INFO channel::common::download_media: ffmpeg: frame=27825 fps= 56 q=-1.0 size=  285952kB time=00:18:33.04 bitrate=2104.6kbits/s speed=2.25x    
+frame=27882 fps= 56 q=-1.0 size=  286464kB time=00:18:35.28 bitrate=2104.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/6d4bLhia.ts' for reading    
+2026-01-25 11:15:06.768  INFO media: Downloading ... 658/406    
+2026-01-25 11:15:07.089  INFO media: Downloading ... 659/406    
+2026-01-25 11:15:07.165  INFO channel::common::download_media: ffmpeg: frame=27900 fps= 56 q=-1.0 size=  286720kB time=00:18:36.04 bitrate=2104.6kbits/s speed=2.25x    
+frame=27941 fps= 56 q=-1.0 size=  287232kB time=00:18:37.64 bitrate=2105.3kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/tIujcGH3.ts' for reading    
+2026-01-25 11:15:08.059  INFO media: Downloading ... 660/406    
+2026-01-25 11:15:08.394  INFO media: Downloading ... 661/406    
+2026-01-25 11:15:08.476  INFO channel::common::download_media: ffmpeg: frame=27975 fps= 56 q=-1.0 size=  287488kB time=00:18:39.06 bitrate=2104.5kbits/s speed=2.25x    
+frame=28020 fps= 56 q=-1.0 size=  288000kB time=00:18:40.80 bitrate=2105.0kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/XwWCkCbv.ts' for reading    
+2026-01-25 11:15:09.388  INFO media: Downloading ... 662/406    
+2026-01-25 11:15:09.724  INFO media: Downloading ... 663/406    
+2026-01-25 11:15:09.788  INFO channel::common::download_media: ffmpeg: frame=28050 fps= 56 q=-1.0 size=  288256kB time=00:18:42.05 bitrate=2104.5kbits/s speed=2.25x    
+frame=28096 fps= 56 q=-1.0 size=  289024kB time=00:18:43.84 bitrate=2106.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/LpqL8S8f.ts' for reading    
+2026-01-25 11:15:10.701  INFO media: Downloading ... 664/406    
+2026-01-25 11:15:11.039  INFO media: Downloading ... 665/406    
+2026-01-25 11:15:11.101  INFO channel::common::download_media: ffmpeg: frame=28125 fps= 56 q=-1.0 size=  289280kB time=00:18:45.05 bitrate=2106.4kbits/s speed=2.25x    
+frame=28171 fps= 56 q=-1.0 size=  289792kB time=00:18:46.84 bitrate=2106.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Ji9FiWil.ts' for reading    
+2026-01-25 11:15:11.997  INFO media: Downloading ... 666/406    
+2026-01-25 11:15:12.342  INFO media: Downloading ... 667/406    
+2026-01-25 11:15:12.424  INFO channel::common::download_media: ffmpeg: frame=28200 fps= 56 q=-1.0 size=  290048kB time=00:18:48.04 bitrate=2106.4kbits/s speed=2.25x    
+frame=28246 fps= 56 q=-1.0 size=  290560kB time=00:18:49.84 bitrate=2106.7kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/zJjNM4X3.ts' for reading    
+2026-01-25 11:15:13.334  INFO media: Downloading ... 668/406    
+2026-01-25 11:15:13.676  INFO media: Downloading ... 669/406    
+2026-01-25 11:15:13.697  INFO channel::common::download_media: ffmpeg: frame=28275 fps= 56 q=-1.0 size=  290816kB time=00:18:51.04 bitrate=2106.3kbits/s speed=2.25x    
+frame=28329 fps= 56 q=-1.0 size=  291584kB time=00:18:53.16 bitrate=2108.0kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/eTPj44Id.ts' for reading    
+2026-01-25 11:15:14.580  INFO media: Downloading ... 670/406    
+2026-01-25 11:15:14.932  INFO media: Downloading ... 671/406    
+2026-01-25 11:15:14.952  INFO channel::common::download_media: ffmpeg: frame=28350 fps= 56 q=-1.0 size=  291584kB time=00:18:54.06 bitrate=2106.3kbits/s speed=2.25x    
+frame=28411 fps= 56 q=-1.0 size=  292096kB time=00:18:56.44 bitrate=2105.6kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/GlpxU0zC.ts' for reading    
+2026-01-25 11:15:15.856  INFO media: Downloading ... 672/406    
+2026-01-25 11:15:16.182  INFO media: Downloading ... 673/406    
+2026-01-25 11:15:16.314  INFO channel::common::download_media: ffmpeg: frame=28425 fps= 56 q=-1.0 size=  292352kB time=00:18:57.05 bitrate=2106.3kbits/s speed=2.25x    
+frame=28465 fps= 56 q=-1.0 size=  292864kB time=00:18:58.60 bitrate=2107.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/JpluOhby.ts' for reading    
+2026-01-25 11:15:17.261  INFO media: Downloading ... 674/406    
+2026-01-25 11:15:17.544  INFO media: Downloading ... 675/406    
+2026-01-25 11:15:17.605  INFO channel::common::download_media: ffmpeg: frame=28500 fps= 56 q=-1.0 size=  293376kB time=00:19:00.05 bitrate=2108.1kbits/s speed=2.25x    
+frame=28555 fps= 56 q=-1.0 size=  293888kB time=00:19:02.20 bitrate=2107.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/vBciLDoG.ts' for reading    
+2026-01-25 11:15:18.553  INFO media: Downloading ... 676/406    
+2026-01-25 11:15:18.838  INFO media: Downloading ... 677/406    
+2026-01-25 11:15:18.918  INFO channel::common::download_media: ffmpeg: frame=28575 fps= 56 q=-1.0 size=  293888kB time=00:19:03.04 bitrate=2106.2kbits/s speed=2.25x    
+frame=28617 fps= 56 q=-1.0 size=  294400kB time=00:19:04.68 bitrate=2106.9kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/ITxGAO9n.ts' for reading    
+2026-01-25 11:15:19.812  INFO media: Downloading ... 678/406    
+2026-01-25 11:15:20.125  INFO media: Downloading ... 679/406    
+2026-01-25 11:15:20.210  INFO channel::common::download_media: ffmpeg: frame=28650 fps= 56 q=-1.0 size=  294912kB time=00:19:06.04 bitrate=2108.1kbits/s speed=2.25x    
+frame=28699 fps= 56 q=-1.0 size=  295424kB time=00:19:07.96 bitrate=2108.2kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/fZmNuwxw.ts' for reading    
+2026-01-25 11:15:21.160  INFO media: Downloading ... 680/406    
+2026-01-25 11:15:21.466  INFO media: Downloading ... 681/406    
+2026-01-25 11:15:21.604  INFO channel::common::download_media: ffmpeg: frame=28725 fps= 56 q=-1.0 size=  295680kB time=00:19:09.06 bitrate=2108.0kbits/s speed=2.25x    
+frame=28761 fps= 56 q=-1.0 size=  296192kB time=00:19:10.44 bitrate=2109.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/YiBTxpok.ts' for reading    
+2026-01-25 11:15:22.504  INFO media: Downloading ... 682/406    
+2026-01-25 11:15:22.833  INFO media: Downloading ... 683/406    
+2026-01-25 11:15:22.848  INFO channel::common::download_media: ffmpeg: frame=28800 fps= 56 q=-1.0 size=  296704kB time=00:19:12.05 bitrate=2109.8kbits/s speed=2.25x    
+frame=28859 fps= 56 q=-1.0 size=  297216kB time=00:19:14.36 bitrate=2109.2kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Lgf1uZ4Q.ts' for reading    
+2026-01-25 11:15:23.795  INFO media: Downloading ... 684/406    
+2026-01-25 11:15:24.043  INFO channel::common::download_media: ffmpeg: frame=28875 fps= 56 q=-1.0 size=  297472kB time=00:19:15.05 bitrate=2109.8kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/T9e39p0V.ts' for reading    
+2026-01-25 11:15:24.975  INFO media: Downloading ... 685/406    
+2026-01-25 11:15:25.248  INFO channel::common::download_media: ffmpeg: frame=28950 fps= 56 q=-1.0 size=  297984kB time=00:19:18.04 bitrate=2107.9kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/B4i1S2k7.ts' for reading    
+2026-01-25 11:15:26.707  INFO media: Downloading ... 686/406    
+2026-01-25 11:15:26.959  INFO channel::common::download_media: ffmpeg: frame=29025 fps= 56 q=-1.0 size=  298496kB time=00:19:21.04 bitrate=2106.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/sScOsN3F.ts' for reading    
+2026-01-25 11:15:27.924  INFO media: Downloading ... 687/406    
+2026-01-25 11:15:28.159  INFO channel::common::download_media: ffmpeg: frame=29100 fps= 56 q=-1.0 size=  299008kB time=00:19:24.06 bitrate=2104.2kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/AlEgK0kc.ts' for reading    
+2026-01-25 11:15:29.100  INFO media: Downloading ... 688/406    
+2026-01-25 11:15:29.342  INFO channel::common::download_media: ffmpeg: frame=29175 fps= 56 q=-1.0 size=  299520kB time=00:19:27.05 bitrate=2102.4kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/ugMBBhhD.ts' for reading    
+2026-01-25 11:15:30.290  INFO media: Downloading ... 689/406    
+2026-01-25 11:15:30.561  INFO media: Downloading ... 690/406    
+2026-01-25 11:15:30.652  INFO channel::common::download_media: ffmpeg: frame=29250 fps= 56 q=-1.0 size=  299776kB time=00:19:30.05 bitrate=2098.8kbits/s speed=2.25x    
+frame=29290 fps= 56 q=-1.0 size=  300288kB time=00:19:31.60 bitrate=2099.7kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/w9pd4yBB.ts' for reading    
+2026-01-25 11:15:31.544  INFO media: Downloading ... 691/406    
+2026-01-25 11:15:31.891  INFO media: Downloading ... 692/406    
+2026-01-25 11:15:31.924  INFO channel::common::download_media: ffmpeg: frame=29325 fps= 56 q=-1.0 size=  300800kB time=00:19:33.04 bitrate=2100.6kbits/s speed=2.25x    
+frame=29381 fps= 56 q=-1.0 size=  301312kB time=00:19:35.24 bitrate=2100.3kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/2vYzEz3w.ts' for reading    
+2026-01-25 11:15:32.836  INFO media: Downloading ... 693/406    
+2026-01-25 11:15:33.166  INFO media: Downloading ... 694/406    
+2026-01-25 11:15:33.208  INFO channel::common::download_media: ffmpeg: frame=29400 fps= 56 q=-1.0 size=  301312kB time=00:19:36.04 bitrate=2098.9kbits/s speed=2.25x    
+frame=29456 fps= 56 q=-1.0 size=  301824kB time=00:19:38.24 bitrate=2098.5kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/qvdxQcQO.ts' for reading    
+2026-01-25 11:15:34.117  INFO media: Downloading ... 695/406    
+2026-01-25 11:15:34.426  INFO media: Downloading ... 696/406    
+2026-01-25 11:15:34.489  INFO channel::common::download_media: ffmpeg: frame=29475 fps= 56 q=-1.0 size=  302080kB time=00:19:39.06 bitrate=2098.8kbits/s speed=2.25x    
+frame=29521 fps= 56 q=-1.0 size=  302592kB time=00:19:40.84 bitrate=2099.2kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/MRDvzBNc.ts' for reading    
+2026-01-25 11:15:35.388  INFO media: Downloading ... 697/406    
+2026-01-25 11:15:35.755  INFO media: Downloading ... 698/406    
+2026-01-25 11:15:35.814  INFO channel::common::download_media: ffmpeg: frame=29550 fps= 56 q=-1.0 size=  302848kB time=00:19:42.05 bitrate=2098.8kbits/s speed=2.25x    
+frame=29599 fps= 56 q=-1.0 size=  303360kB time=00:19:43.96 bitrate=2099.0kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/ktfENyKs.ts' for reading    
+2026-01-25 11:15:36.772  INFO media: Downloading ... 699/406    
+2026-01-25 11:15:37.149  INFO media: Downloading ... 700/406    
+2026-01-25 11:15:37.294  INFO channel::common::download_media: ffmpeg: frame=29625 fps= 56 q=-1.0 size=  303616kB time=00:19:45.05 bitrate=2098.8kbits/s speed=2.25x    
+frame=29661 fps= 56 q=-1.0 size=  304128kB time=00:19:46.44 bitrate=2099.9kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/5579exgY.ts' for reading    
+2026-01-25 11:15:38.250  INFO media: Downloading ... 701/406    
+2026-01-25 11:15:38.581  INFO media: Downloading ... 702/406    
+2026-01-25 11:15:38.636  INFO channel::common::download_media: ffmpeg: frame=29700 fps= 56 q=-1.0 size=  304384kB time=00:19:48.04 bitrate=2098.8kbits/s speed=2.25x    
+frame=29754 fps= 56 q=-1.0 size=  304896kB time=00:19:50.16 bitrate=2098.6kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/LP1zeyBE.ts' for reading    
+2026-01-25 11:15:39.580  INFO media: Downloading ... 703/406    
+2026-01-25 11:15:39.922  INFO media: Downloading ... 704/406    
+2026-01-25 11:15:39.943  INFO channel::common::download_media: ffmpeg: frame=29775 fps= 56 q=-1.0 size=  305152kB time=00:19:51.04 bitrate=2098.8kbits/s speed=2.25x    
+frame=29830 fps= 56 q=-1.0 size=  305664kB time=00:19:53.20 bitrate=2098.6kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/ZIKH5xkL.ts' for reading    
+2026-01-25 11:15:40.842  INFO media: Downloading ... 705/406    
+2026-01-25 11:15:41.178  INFO media: Downloading ... 706/406    
+2026-01-25 11:15:41.254  INFO channel::common::download_media: ffmpeg: frame=29850 fps= 56 q=-1.0 size=  305920kB time=00:19:54.06 bitrate=2098.8kbits/s speed=2.25x    
+frame=29897 fps= 56 q=-1.0 size=  306432kB time=00:19:55.88 bitrate=2099.1kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/Js0iyXR9.ts' for reading    
+2026-01-25 11:15:42.154  INFO media: Downloading ... 707/406    
+2026-01-25 11:15:42.482  INFO media: Downloading ... 708/406    
+2026-01-25 11:15:42.575  INFO channel::common::download_media: ffmpeg: frame=29925 fps= 56 q=-1.0 size=  306688kB time=00:19:57.05 bitrate=2098.8kbits/s speed=2.25x    
+frame=29973 fps= 56 q=-1.0 size=  307200kB time=00:19:58.92 bitrate=2099.0kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/jHMOSSuW.ts' for reading    
+2026-01-25 11:15:43.483  INFO media: Downloading ... 709/406    
+2026-01-25 11:15:43.817  INFO media: Downloading ... 710/406    
+2026-01-25 11:15:43.951  INFO channel::common::download_media: ffmpeg: frame=30000 fps= 56 q=-1.0 size=  307712kB time=00:20:00.05 bitrate=2100.6kbits/s speed=2.25x    
+frame=30042 fps= 56 q=-1.0 size=  308224kB time=00:20:01.68 bitrate=2101.2kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/CQK4gkCY.ts' for reading    
+2026-01-25 11:15:44.849  INFO media: Downloading ... 711/406    
+2026-01-25 11:15:45.181  INFO media: Downloading ... 712/406    
+2026-01-25 11:15:45.269  INFO channel::common::download_media: ffmpeg: frame=30075 fps= 56 q=-1.0 size=  308736kB time=00:20:03.04 bitrate=2102.3kbits/s speed=2.25x    
+frame=30110 fps= 56 q=-1.0 size=  309248kB time=00:20:04.40 bitrate=2103.4kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/zfY64Xlj.ts' for reading    
+2026-01-25 11:15:46.176  INFO media: Downloading ... 713/406    
+2026-01-25 11:15:46.562  INFO media: Downloading ... 714/406    
+2026-01-25 11:15:46.610  INFO channel::common::download_media: ffmpeg: frame=30150 fps= 56 q=-1.0 size=  309760kB time=00:20:06.04 bitrate=2104.0kbits/s speed=2.25x    
+frame=30197 fps= 56 q=-1.0 size=  310272kB time=00:20:07.88 bitrate=2104.3kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/0kN97tH3.ts' for reading    
+2026-01-25 11:15:47.423  INFO media: Downloading ... 715/406    
+2026-01-25 11:15:47.827  INFO media: Downloading ... 716/406    
+2026-01-25 11:15:47.845  INFO channel::common::download_media: ffmpeg: frame=30225 fps= 56 q=-1.0 size=  310784kB time=00:20:09.06 bitrate=2105.7kbits/s speed=2.25x    
+frame=30294 fps= 56 q=-1.0 size=  311296kB time=00:20:11.76 bitrate=2104.5kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/4xRp2s9h.ts' for reading    
+2026-01-25 11:15:48.584  INFO media: Downloading ... 717/406    
+2026-01-25 11:15:49.096  INFO media: Downloading ... 718/406    
+2026-01-25 11:15:49.202  INFO channel::common::download_media: ffmpeg: frame=30300 fps= 56 q=-1.0 size=  311296kB time=00:20:12.05 bitrate=2104.0kbits/s speed=2.25x    
+frame=30345 fps= 56 q=-1.0 size=  311808kB time=00:20:13.80 bitrate=2104.4kbits/s speed=2.25x    
+[hls @ 0xaaaabc34aab0] Opening 'crypto+https://vodcnd09.myqqdd.com/20250922/9XmY4wZW/3766kb/hls/BJJt1QhA.ts' for reading    
+2026-01-25 11:15:49.934  INFO media: Downloading ... 719/406    
+2026-01-25 11:15:50.270  INFO channel::common::download_media: ffmpeg: frame=30375 fps= 56 q=-1.0 size=  312320kB time=00:20:15.05 bitrate=2105.7kbits/s speed=2.25x    
+frame=30423 fps= 56 q=-1.0 Lsize=  313424kB time=00:20:16.93 bitrate=2109.9kbits/s speed=2.25x        
+2026-01-25 11:15:50.270  INFO channel::common::download_media: ffmpeg: video:303103kB audio:9829kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.157293%    
+2026-01-25 11:15:50.271  INFO media: Downloading ... 720/406    
+2026-01-25 11:15:50.320  INFO channel::common::download_media: Done. "/home/working/downloads/96473-14.mp4"    
+2026-01-25 11:15:50.321  INFO media: Done    
+2026-01-25 11:15:50.321  INFO media: Rename file from /home/working/downloads/96473-14.mp4 to /home/working/media/tv_shows/诛仙 第三季 (2025)/Season 01/诛仙 第三季 S01E14.mp4    
+2026-01-25 11:15:50.704  INFO channel: Downloading media 96473 (Some(15))    
+2026-01-25 11:15:50.704  INFO channel: Found channel named 'maotai'    
+2026-01-25 11:15:50.704  INFO channel::services::unified: Getting video detail of "96473"    
+2026-01-25 11:15:50.705  INFO channel::services::unified::api: Getting details with ids: 96473    
+2026-01-25 11:15:52.066  INFO channel::common::download_media: Starting fetch media playlist: https://vodcnd09.myqqdd.com/20250922/BmjtWQEG/index.m3u8    
+2026-01-25 11:15:52.677  INFO channel::common::download_media: Got master playlist: MasterPlaylist {
+    version: None,
+    variants: [
+        VariantStream {
+            is_i_frame: false,
+            uri: "/20250922/BmjtWQEG/3739kb/hls/index.m3u8",
+            bandwidth: 3739000,
+            average_bandwidth: None,
+            codecs: None,
+            resolution: Some(
+                Resolution {
+                    width: 1920,
+                    height: 804,
+                },
+            ),

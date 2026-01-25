@@ -1,51 +1,51 @@
-use crate::common::temporary_directory;
 use m3u8_rs::{parse_playlist_res, MasterPlaylist, MediaPlaylist, Playlist};
 use protocol::{DownloadProgressExt, DownloadProgressReceiver, DownloadProgressStream};
 use reqwest::Client;
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::str::FromStr;
-use std::sync::Arc;
+use std::path::Path;
+use std::process::Stdio;
 use tokio::fs;
-use tokio::sync::Semaphore;
+use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Command;
 use url::{Origin, Url};
 
 pub struct DownloadMediaOptions<'a> {
   pub download_url: &'a str,
   pub destination_path: &'a Path,
-  pub parallel_size: usize,
 }
 
-pub async fn download_media(
+pub async fn download_media_using_ffmpeg(
   options: DownloadMediaOptions<'_>,
 ) -> anyhow::Result<DownloadProgressReceiver> {
   let playlist = fetch_media_playlist(options.download_url).await?;
 
   let total_segments = playlist.segments.len();
-  let download_progress_stream = stream::Stream::new(Ok);
+  let stream = stream::Stream::new(Ok);
 
-  download_progress_stream.start(total_segments);
-
-  let receiver = download_progress_stream.recv();
+  stream.start(total_segments);
+  let receiver = stream.recv();
 
   tokio::spawn({
-    let parallel_size = options.parallel_size;
+    let download_url = options.download_url.to_string();
     let destination_path = options.destination_path.to_path_buf();
 
     async move {
-      if let Err(err) = download_and_transform(
-        playlist,
-        &download_progress_stream,
-        parallel_size,
-        destination_path,
-      )
-      .await
-      {
-        log::error!("Failed download video: {}", err);
-        download_progress_stream.failed(&err.to_string());
+      log::info!(
+        "Downloading media using ffmpeg: {} (total segments: {})",
+        download_url,
+        total_segments
+      );
 
-        anyhow::bail!(err)
+      if let Err(err) =
+        download_with_ffmpeg_progress(&download_url, &destination_path, &stream, total_segments)
+          .await
+      {
+        log::error!("Failed to download with ffmpeg: {}", err);
+        stream.failed(&err.to_string());
+        return Err(err);
       }
+
+      log::info!("Done. {:?}", destination_path);
+      stream.done(&destination_path.to_string_lossy());
 
       Ok(()) as anyhow::Result<()>
     }
@@ -54,96 +54,129 @@ pub async fn download_media(
   Ok(receiver)
 }
 
-async fn download_and_transform(
-  playlist: MediaPlaylist,
-  download_progress_stream: &DownloadProgressStream,
-  parallel_size: usize,
-  destination_path: PathBuf,
+async fn download_with_ffmpeg_progress(
+  download_url: &str,
+  destination_path: &Path,
+  stream: &DownloadProgressStream,
+  total_segments: usize,
 ) -> anyhow::Result<()> {
-  log::info!("Downloading segments ... ");
-  let updated_playlist =
-    download_segments_of_playlist(playlist, parallel_size, download_progress_stream)
-      .await
-      .map_err(|e| anyhow::anyhow!("Download segments failed: {}", e))?;
-
-  log::info!("Writing to file system ... ");
-
-  let mut bytes: Vec<u8> = Vec::new();
-
-  updated_playlist.write_to(&mut bytes)?;
-
-  let destination_file_name = destination_path.file_name().unwrap();
-
-  let m3u8_file_name = format!("{}.m3u8", destination_file_name.to_str().unwrap());
-  let m3u8_path = temporary_directory().await?.join(m3u8_file_name);
-
-  fs::write(&m3u8_path, bytes).await?;
-
-  download_progress_stream.transforming_video();
-
-  if destination_path.exists() {
-    log::info!("Download file exists. removing it");
-    fs::remove_file(&destination_path).await?;
-  }
-
-  log::info!("Transforming video ... ");
-
   fs::create_dir_all(destination_path.parent().unwrap()).await?;
 
-  transform_video(&m3u8_path, &destination_path).await?;
+  let mut child = Command::new("ffmpeg")
+    .arg("-i")
+    .arg(download_url)
+    .arg("-c")
+    .arg("copy")
+    .arg("-y")
+    .arg(destination_path)
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()?;
 
-  log::info!("Done. {:?}", destination_path);
-  download_progress_stream.done(&destination_path.to_string_lossy());
+  let stdout = child.stdout.take().unwrap();
+  let stderr = child.stderr.take().unwrap();
 
-  Ok(()) as anyhow::Result<()>
+  // Capture stdout (usually empty for this use case)
+  let stdout_handle = tokio::spawn(async move {
+    let reader = BufReader::new(stdout);
+    let mut lines = reader.lines();
+    while let Ok(Some(_line)) = lines.next_line().await {
+      // stdout is usually empty when not using -progress
+    }
+  });
+
+  let stream_clone = stream.clone();
+  let stderr_handle = tokio::spawn(async move {
+    let reader = BufReader::new(stderr);
+    let mut lines = reader.lines();
+    let mut last_reported_time = 0.0;
+    let mut segment_count = 0;
+
+    while let Ok(Some(line)) = lines.next_line().await {
+      log::info!("ffmpeg: {}", line);
+
+      // Count HLS segments being opened
+      // Example: "[hls @ 0xaaaabc34aab0] Opening 'crypto+https://...' for reading"
+      if line.contains("[hls @") && line.contains("Opening") {
+        segment_count += 1;
+      }
+
+      // Parse progress from frame output
+      // Example: "frame=25200 fps= 56 q=-1.0 size=  262912kB time=00:16:48.04 bitrate=2136.6kbits/s speed=2.23x"
+      if line.contains("frame=") && line.contains("time=") {
+        if let Some(current_time) = parse_time_from_frame_line(&line) {
+          // Only report if time changed significantly (more than 3 seconds)
+          if current_time - last_reported_time >= 3.0 {
+            let progress_pct = if total_segments > 0 {
+              (segment_count as f64 / total_segments as f64 * 100.0).min(99.0) as usize
+            } else {
+              0
+            };
+
+            stream_clone.segment_downloaded(&format!(
+              "Downloading: {:.0}m {:.0}s - {}/{} segments ({}%)",
+              current_time / 60.0,
+              current_time % 60.0,
+              segment_count,
+              total_segments,
+              progress_pct
+            ));
+            last_reported_time = current_time;
+          }
+        }
+      }
+
+      // Detect completion - look for final summary line
+      // Example: "frame=30423 fps= 56 q=-1.0 Lsize=  313424kB time=00:20:16.93 bitrate=2109.9kbits/s speed=2.25x"
+      if line.contains("Lsize=") && line.contains("time=") {
+        if let Some(final_time) = parse_time_from_frame_line(&line) {
+          stream_clone.segment_downloaded(&format!(
+            "Completed: {:.0}m {:.0}s - {}/{} segments",
+            final_time / 60.0,
+            final_time % 60.0,
+            segment_count,
+            total_segments
+          ));
+        }
+      }
+    }
+  });
+
+  let status = child.wait().await?;
+
+  stdout_handle.await?;
+  stderr_handle.await?;
+
+  if !status.success() {
+    anyhow::bail!("ffmpeg command failed with status: {:?}", status);
+  }
+
+  Ok(())
 }
 
-async fn download_segments_of_playlist(
-  mut playlist: MediaPlaylist,
-  parallel_size: usize,
-  stream: &DownloadProgressStream,
-) -> anyhow::Result<MediaPlaylist> {
-  let semaphore = Arc::new(Semaphore::new(parallel_size));
-
-  let mut handles = vec![];
-
-  for (idx, segment) in playlist.segments.iter().enumerate() {
-    let semaphore = semaphore.clone();
-
-    let handle = tokio::spawn({
-      let stream = stream.clone();
-      let uri = segment.uri.clone();
-
-      async move {
-        let _permit = semaphore.acquire().await?;
-
-        let downloaded_path = download_media_segment(&uri).await?;
-
-        stream.segment_downloaded(&format!("Segment downloaded: {}", idx));
-
-        // Wait 3s for avoid 429 error
-        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
-
-        Ok(downloaded_path) as anyhow::Result<PathBuf>
-      }
-    });
-
-    handles.push(handle);
+fn parse_time_from_frame_line(line: &str) -> Option<f64> {
+  // Parse line like "frame=25200 fps= 56 q=-1.0 size=  262912kB time=00:16:48.04 bitrate=2136.6kbits/s speed=2.23x"
+  if let Some(time_part) = line.split("time=").nth(1) {
+    if let Some(time_str) = time_part.split_whitespace().next() {
+      return parse_time_string(time_str);
+    }
   }
+  None
+}
 
-  let total = handles.len();
-
-  for idx in 0..total {
-    let handle = handles.get_mut(idx).unwrap();
-
-    let downloaded_path = handle
-      .await
-      .map_err(|e| anyhow::anyhow!("Error occurred during download segment '{}': {}", idx, e))??;
-
-    playlist.segments.get_mut(idx).unwrap().uri = downloaded_path.to_string_lossy().to_string();
+fn parse_time_string(time_str: &str) -> Option<f64> {
+  // Parse time string like "00:16:48.04"
+  let parts: Vec<&str> = time_str.split(':').collect();
+  if parts.len() == 3 {
+    if let (Ok(hours), Ok(minutes), Ok(seconds)) = (
+      parts[0].parse::<f64>(),
+      parts[1].parse::<f64>(),
+      parts[2].parse::<f64>(),
+    ) {
+      return Some(hours * 3600.0 + minutes * 60.0 + seconds);
+    }
   }
-
-  Ok(playlist)
+  None
 }
 
 #[async_recursion::async_recursion]
@@ -189,74 +222,6 @@ async fn parse_master_playlist(
   } else {
     anyhow::bail!("Unsupported format")
   }
-}
-
-// TODO: Provide a config for download segment
-async fn download_media_segment(download_url: &str) -> anyhow::Result<PathBuf> {
-  let client = Client::builder()
-    // .http2_adaptive_window(true)
-    // .http2_prior_knowledge()
-    .use_rustls_tls()
-    .build()
-    .map_err(|err| anyhow::anyhow!("Failed to build reqwest: {:#?}", err))?;
-
-  let res = client
-    .get(download_url)
-    .send()
-    .await
-    .map_err(|e| anyhow::anyhow!("Failed to send request: {}", e))?;
-
-  let status = res.status();
-  if !status.is_success() {
-    log::error!("Request failed with code {}", status);
-    log::error!("{:#?}", res.headers());
-
-    anyhow::bail!("Request failed with code {}", status);
-  }
-
-  let bytes = res
-    .bytes()
-    .await
-    .map_err(|e| anyhow::anyhow!("Failed to read response: {}", e))?
-    .to_vec();
-
-  let temp_dir = temporary_directory().await?;
-
-  let parsed_url = Url::from_str(download_url)
-    .map_err(|e| anyhow::anyhow!("Invalid url {}: {}", download_url, e))?;
-
-  let path_segments = parsed_url
-    .path_segments()
-    .ok_or_else(|| anyhow::anyhow!("Invalid url {}", download_url))?;
-
-  let file_name = path_segments
-    .last()
-    .ok_or_else(|| anyhow::anyhow!("Invalid url {}", download_url))?;
-
-  let download_file_name = temp_dir.join(file_name);
-
-  fs::write(&download_file_name, bytes).await?;
-
-  Ok(download_file_name)
-}
-
-async fn transform_video(source: &Path, dest: &Path) -> anyhow::Result<()> {
-  let output = Command::new("ffmpeg")
-    .arg("-i")
-    .arg(source)
-    .arg("-codec")
-    .arg("copy")
-    .arg(dest)
-    .output()?;
-
-  if !output.status.success() {
-    log::error!("invalid exit code: {:?}", output.status);
-
-    log::error!("Stdout: {}", String::from_utf8(output.stdout)?);
-    log::error!("Stderr: {}", String::from_utf8(output.stderr)?);
-  }
-
-  Ok(())
 }
 
 fn normalize_media_playlist(media_playlist: &mut MediaPlaylist, origin: &str) {
