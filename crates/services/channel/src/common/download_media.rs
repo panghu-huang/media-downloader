@@ -93,8 +93,6 @@ async fn download_with_ffmpeg_progress(
     let mut segment_count = 0;
 
     while let Ok(Some(line)) = lines.next_line().await {
-      log::info!("ffmpeg: {}", line);
-
       // Count HLS segments being opened
       // Example: "[hls @ 0xaaaabc34aab0] Opening 'crypto+https://...' for reading"
       if line.contains("[hls @") && line.contains("Opening") {
@@ -112,15 +110,17 @@ async fn download_with_ffmpeg_progress(
             } else {
               0
             };
-
-            stream_clone.segment_downloaded(&format!(
+            let msg = format!(
               "Downloading: {:.0}m {:.0}s - {}/{} segments ({}%)",
               current_time / 60.0,
               current_time % 60.0,
               segment_count,
               total_segments,
               progress_pct
-            ));
+            );
+
+            // stream_clone.segment_downloaded(&msg);
+            log::info!("{}", msg);
             last_reported_time = current_time;
           }
         }

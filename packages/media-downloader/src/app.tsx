@@ -1,30 +1,17 @@
 import * as React from 'react'
 import type { AppProps, ReactRenderContext } from '@coodev/react/types'
 import type { LoaderContext } from '@/common/types'
-
-interface ErrorProps {
-  isError: boolean
-  error: {
-    message: string
-    stack: string
-  }
-}
+import { Error, ErrorProps } from './components/error'
+import { NotFound } from './components/not-found'
+import { ToastProvider } from '@/components/ui/toast'
 
 type PageProps = ErrorProps | object
 
 const Main: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <main className="bg-background">{children}</main>
-}
-
-const Error: React.FC<ErrorProps> = ({ error }) => {
   return (
-    <Main>
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-        <pre>{error.stack}</pre>
-      </div>
-    </Main>
+    <ToastProvider>
+      <main className="bg-background">{children}</main>
+    </ToastProvider>
   )
 }
 
@@ -35,9 +22,7 @@ const App: React.FC<AppProps<PageProps>> = ({ Component, pageProps }) => {
 
   if (!Component) {
     return (
-      <Main>
-        <h1 className="font-bold text-center text-lg p-8">Page not found</h1>
-      </Main>
+      <NotFound />
     )
   }
 

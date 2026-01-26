@@ -179,7 +179,7 @@ impl MediaService {
     while let Some(evt) = progress.message().await.unwrap() {
       match evt {
         protocol::DownloadProgressItem::Done { local_path, .. } => {
-          log::info!("Done");
+          log::info!("Download done: {}", local_path);
           return Ok(PathBuf::from(local_path));
         }
         protocol::DownloadProgressItem::Started {

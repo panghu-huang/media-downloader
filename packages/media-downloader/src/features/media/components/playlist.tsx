@@ -24,23 +24,33 @@ const Playlist: React.FC<PlaylistProps> = ({
   onToggle,
 }) => {
   return (
-    <div className="media-playlist">
-      {playlist.map((item, index) => {
-        const prefix = String(index + 1)
-        const text = String(item.text).trim()
+    <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Episodes
+        </h2>
+        <span className="text-sm text-slate-500 dark:text-slate-400">
+          {playlist.length} episodes
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {playlist.map((item, index) => {
+          const prefix = String(index + 1)
+          const text = String(item.text).trim()
 
-        return (
-          <Toggle
-            key={item.number}
-            className="m-1"
-            title={item.text}
-            pressed={isSelected(item.number, start, end)}
-            onClick={() => onToggle(item.number)}
-          >
-            {prefix === text ? text : `${prefix} (${text})`}
-          </Toggle>
-        )
-      })}
+          return (
+            <Toggle
+              key={item.number}
+              title={item.text}
+              pressed={isSelected(item.number, start, end)}
+              onClick={() => onToggle(item.number)}
+              className="data-[state=on]:bg-blue-600 data-[state=on]:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              {prefix === text ? text : `${prefix} (${text})`}
+            </Toggle>
+          )
+        })}
+      </div>
     </div>
   )
 }
