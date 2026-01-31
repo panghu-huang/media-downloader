@@ -239,9 +239,19 @@ impl MediaService {
       .to_string_lossy()
       .to_string();
 
-    let base_dir_name = format!("{} ({})", metadata.name, metadata.release_year);
-    let season_dir_name = format!("Season {}", "01");
-    let file_name = format!("{} S{}E{}.{}", metadata.name, "01", episode_number, ext);
+    let (media_name, season_number) = Self::parse_season_number_from_media_name(&metadata.name)
+      .unwrap_or((
+        metadata.name.clone(),
+        1, // 默认第一季
+      ));
+
+    let base_dir_name = media_name;
+    let season_string = format!("{:02}", season_number);
+    let season_dir_name = format!("Season {}", season_string);
+    let file_name = format!(
+      "{} S{}E{}.{}",
+      metadata.name, season_string, episode_number, ext
+    );
 
     let new_local_path = media_dir
       .join("tv_shows")
@@ -258,6 +268,46 @@ impl MediaService {
     rename_file(local_path, new_local_path)?;
 
     Ok(())
+  }
+
+  // 如果 名字以 Xxx 第二季 第三季 第四季 之类的格式结尾，则解析出季数
+  fn parse_season_number_from_media_name(media_name: &str) -> anyhow::Result<(String, u8)> {
+    let pattern =
+      regex::Regex::new(r"^(?P<base_name>.+?)\s*第(?P<season_number>[一二三四五六七八九十]+)季$")?;
+    if let Some(captures) = pattern.captures(media_name) {
+      let base_name = captures
+        .name("base_name")
+        .ok_or(anyhow::anyhow!("Failed to parse base name"))?
+        .as_str()
+        .to_string();
+      let season_number = captures
+        .name("season_number")
+        .ok_or(anyhow::anyhow!("Failed to parse season number"))?
+        .as_str()
+        .to_string();
+
+      let season_number = match season_number.as_str() {
+        "一" => 1,
+        "二" => 2,
+        "三" => 3,
+        "四" => 4,
+        "五" => 5,
+        "六" => 6,
+        "七" => 7,
+        "八" => 8,
+        "九" => 9,
+        "十" => 10,
+        _ => {
+          return Err(anyhow::anyhow!("Unsupported season number format"));
+        }
+      };
+
+      Ok((base_name, season_number))
+    } else {
+      Err(anyhow::anyhow!(
+        "Media name does not match the expected format"
+      ))
+    }
   }
 }
 
@@ -277,4 +327,44 @@ fn media_dir() -> PathBuf {
     .expect("Failed to detect media directory");
 
   base_dir.join("media")
+}
+
+#[cfg(test)]
+mod tests {
+  use super::MediaService;
+
+  #[test]
+  fn test_parse_season_number_from_media_name() {
+    let test_cases = vec![
+      ("Awesome Show 第二季", Some(("Awesome Show".to_string(), 2))),
+      ("Great Series 第三季", Some(("Great Series".to_string(), 3))),
+      ("剧名 第一季", Some(("剧名".to_string(), 1))),
+      ("剧名 第二季", Some(("剧名".to_string(), 2))),
+      ("剧名 第四季", Some(("剧名".to_string(), 4))),
+      (
+        "Another Show 第十季",
+        Some(("Another Show".to_string(), 10)),
+      ),
+      ("No Season Info", None),
+      ("Invalid Format 第十一季", None),
+    ];
+
+    for (input, expected) in test_cases {
+      let result = MediaService::parse_season_number_from_media_name(input);
+      match expected {
+        Some((expected_name, expected_season)) => {
+          let (parsed_name, parsed_season) = result.expect("Expected successful parse");
+          assert_eq!(parsed_name, expected_name);
+          assert_eq!(parsed_season, expected_season);
+        }
+        None => {
+          assert!(
+            result.is_err(),
+            "Expected parse to fail for input: {}",
+            input
+          );
+        }
+      }
+    }
+  }
 }

@@ -1475,6 +1475,7 @@ dependencies = [
  "log",
  "models",
  "protocol",
+ "regex",
  "rpc-client",
  "tokio",
  "tokio-stream",
