@@ -18,6 +18,7 @@ export interface DetailsPageParams {
 }
 
 export interface DetailsProps {
+  channel: string
   metadata: MediaMetadata
   playlist: MediaPlaylistItem[]
 }
@@ -44,7 +45,10 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
         count,
       })
 
-      toast(count > 1 ? `${count} episodes download started` : 'Download started', 'success')
+      toast(
+        count > 1 ? `${count} episodes download started` : 'Download started',
+        'success',
+      )
 
       clearSelection()
     } catch (err) {
@@ -53,11 +57,12 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
     }
   }
 
-  const selectedCount = start !== undefined && end !== undefined
-    ? end - start + 1
-    : start !== undefined || end !== undefined
-      ? 1
-      : 0
+  const selectedCount =
+    start !== undefined && end !== undefined
+      ? end - start + 1
+      : start !== undefined || end !== undefined
+        ? 1
+        : 0
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -68,7 +73,12 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
       </div>
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <Metadata metadata={metadata} />
-        <Playlist playlist={playlist} start={start} end={end} onToggle={toggle} />
+        <Playlist
+          playlist={playlist}
+          start={start}
+          end={end}
+          onToggle={toggle}
+        />
         <div className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg">
           <div>
             {selectedCount > 0 && (
@@ -82,7 +92,9 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
             onClick={download}
             className="px-8 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-colors"
           >
-            {selectedCount > 0 ? `Download ${selectedCount} Episode${selectedCount > 1 ? 's' : ''}` : 'Select Episodes'}
+            {selectedCount > 0
+              ? `Download ${selectedCount} Episode${selectedCount > 1 ? 's' : ''}`
+              : 'Select Episodes'}
           </Button>
         </div>
       </div>
@@ -99,6 +111,7 @@ const loader = async ({
   ])
 
   return {
+    channel: params.channel,
     metadata,
     playlist: playlist.items,
   }

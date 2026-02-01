@@ -10,7 +10,7 @@ use axum::http::{HeaderValue, Method};
 use axum::routing::{get, post};
 use axum::Router;
 use configuration::Configuration;
-use controllers::media;
+use controllers::{channel, media};
 use rpc_client::RpcClient;
 use state::AppState;
 use std::net::SocketAddr;
@@ -47,6 +47,7 @@ impl Gateway {
     let state = AppState::new(self.client.clone(), self.config.clone());
 
     let router = Router::new()
+      .route("/channels", get(channel::get_channels))
       .route(
         "/channels/:channel_name/media/:media_id",
         get(media::get_media_metadata),

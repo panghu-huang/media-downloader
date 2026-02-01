@@ -6,6 +6,7 @@ fn main() {
     codec crate::json_codec::JsonCodec;
 
     service Channel {
+      rpc GetChannels(crate::channel::GetChannelsRequest) returns (crate::channel::GetChannelsResponse) {}
       rpc DownloadMedia(crate::channel::DownloadMediaRequest) returns (stream crate::DownloadProgressItem) {}
       rpc GetMediaMetadata(crate::channel::GetMediaMetadataRequest) returns (crate::channel::MediaMetadata) {}
       rpc SearchMedia(crate::channel::SearchMediaRequest) returns (crate::channel::SearchMediaResponse) {}

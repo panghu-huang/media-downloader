@@ -21,6 +21,7 @@ pub struct AppConfiguration {
 
 #[derive(Deserialize, Clone)]
 pub struct UnifiedItemConfig {
+  pub name: String,
   #[serde(rename = "url")]
   pub base_url: String,
   #[serde(rename = "http-version")]

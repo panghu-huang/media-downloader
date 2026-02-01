@@ -4,6 +4,7 @@ mod services;
 use configuration::Configuration;
 use protocol::channel::ChannelExt;
 use protocol::channel::DownloadMediaRequest;
+use protocol::channel::{ChannelInfo, GetChannelsRequest, GetChannelsResponse};
 use protocol::channel::{GetMediaMetadataRequest, MediaMetadata};
 use protocol::channel::{GetMediaPlaylistRequest, MediaPlaylist};
 use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
@@ -25,6 +26,26 @@ pub struct ChannelService {
 impl ChannelExt for ChannelService {
   type DownloadMediaStream = DownloadProgressReceiver;
 
+  async fn get_channels(
+    &self,
+    _request: Request<GetChannelsRequest>,
+  ) -> tonic::Result<Response<GetChannelsResponse>> {
+    log::info!("Getting all channels");
+
+    let channels: Vec<ChannelInfo> = self
+      .channels
+      .iter()
+      .map(|(channel_id, channel)| ChannelInfo {
+        id: channel_id.clone(),
+        name: channel.display_name().to_string(),
+        base_url: channel.base_url().to_string(),
+        default: channel_id == &self.default_channel,
+      })
+      .collect();
+
+    Ok(Response::new(GetChannelsResponse { channels }))
+  }
+
   async fn download_media(
     &self,
     request: Request<DownloadMediaRequest>,
@@ -44,7 +65,7 @@ impl ChannelExt for ChannelService {
       destination_path: self.destination_dir.join(file_name),
     };
 
-    let channel = self.get_channel_by_name(&request.channel)?;
+    let channel = self.get_channel_by_id(&request.channel)?;
 
     let download_progress_receiver = channel
       .download_media(options)
@@ -61,7 +82,7 @@ impl ChannelExt for ChannelService {
     let request = request.into_inner();
     log::info!("Getting media metadata of {}", request.media_id);
 
-    let channel = self.get_channel_by_name(&request.channel)?;
+    let channel = self.get_channel_by_id(&request.channel)?;
 
     let metadata = channel
       .get_media_metadata(&request.media_id)
@@ -79,7 +100,7 @@ impl ChannelExt for ChannelService {
     log::info!("Searching media metadata of {}", request.keyword);
 
     let channel_name = request.channel.as_ref().unwrap_or(&self.default_channel);
-    let channel = self.get_channel_by_name(channel_name)?;
+    let channel = self.get_channel_by_id(channel_name)?;
 
     let search_result = channel
       .search_media(&request)
@@ -96,7 +117,7 @@ impl ChannelExt for ChannelService {
     let request = request.into_inner();
     log::info!("Getting media playlist of {}", request.media_id);
 
-    let channel = self.get_channel_by_name(&request.channel)?;
+    let channel = self.get_channel_by_id(&request.channel)?;
 
     let playlist = channel
       .get_media_playlist(&request.media_id)
@@ -108,13 +129,17 @@ impl ChannelExt for ChannelService {
 }
 
 impl ChannelService {
-  fn get_channel_by_name(&self, name: &str) -> tonic::Result<&dyn MediaChannelExt> {
+  fn get_channel_by_id(&self, channel_id: &str) -> tonic::Result<&dyn MediaChannelExt> {
     let channel = self
       .channels
-      .get(name)
-      .ok_or_else(|| Status::invalid_argument(format!("No channel '{}' found.", name)))?;
+      .get(channel_id)
+      .ok_or_else(|| Status::invalid_argument(format!("No channel '{}' found.", channel_id)))?;
 
-    log::info!("Found channel named '{}'", channel.channel_name());
+    log::info!(
+      "Found channel with id '{}', name '{}'",
+      channel_id,
+      channel.display_name()
+    );
 
     Ok(channel.borrow())
   }
@@ -126,19 +151,16 @@ impl ChannelService {
 
     let mut channels = HashMap::new();
 
-    for (channel_name, config) in &config.channel.unified_channels {
-      let unified_channel = UnifiedMediaService::new(channel_name, config);
+    for (channel_id, config) in &config.channel.unified_channels {
+      let unified_channel = UnifiedMediaService::new(channel_id, config);
 
       log::info!(
         "Adding new unified channel {} with base URL {} ... ",
-        channel_name,
+        channel_id,
         config.base_url,
       );
 
-      channels.insert(
-        channel_name.to_string(),
-        Box::new(unified_channel) as Box<_>,
-      );
+      channels.insert(channel_id.to_string(), Box::new(unified_channel) as Box<_>);
     }
 
     Self {

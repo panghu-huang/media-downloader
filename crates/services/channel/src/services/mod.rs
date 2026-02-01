@@ -14,7 +14,8 @@ pub struct DownloadMediaOptions {
 
 #[async_trait::async_trait]
 pub trait MediaChannelExt: Send + Sync {
-  fn channel_name(&self) -> &'static str;
+  fn display_name(&self) -> &str;
+  fn base_url(&self) -> &str;
   async fn download_media(
     &self,
     options: DownloadMediaOptions,

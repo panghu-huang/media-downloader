@@ -14,15 +14,21 @@ use protocol::channel::{SearchMediaRequest, SearchMediaResponse};
 use protocol::DownloadProgressReceiver;
 
 pub struct UnifiedMediaService {
+  channel_id: String,
+  display_name: String,
   api: UnifiedAPI,
-  channel_name: String,
+  base_url: String,
   types: Mutex<Vec<TypeItem>>,
 }
 
 #[async_trait::async_trait]
 impl MediaChannelExt for UnifiedMediaService {
-  fn channel_name(&self) -> &'static str {
-    Box::leak(Box::new(self.channel_name.clone()))
+  fn display_name(&self) -> &str {
+    &self.display_name
+  }
+
+  fn base_url(&self) -> &str {
+    &self.base_url
   }
 
   async fn download_media(
@@ -73,7 +79,7 @@ impl MediaChannelExt for UnifiedMediaService {
 
     Ok(MediaMetadata {
       kind,
-      channel: self.channel_name.clone(),
+      channel: self.channel_id.clone(),
       id: detail.id.to_string(),
       name: detail.name,
       release_year,
@@ -115,7 +121,7 @@ impl MediaChannelExt for UnifiedMediaService {
 
         MediaMetadata {
           kind,
-          channel: self.channel_name.clone(),
+          channel: self.channel_id.clone(),
           id: detail.id.to_string(),
           name: detail.name.clone(),
           release_year,
@@ -155,7 +161,7 @@ impl MediaChannelExt for UnifiedMediaService {
       .collect();
 
     Ok(MediaPlaylist {
-      channel: self.channel_name.clone(),
+      channel: self.channel_id.clone(),
       media_id: media_id.to_string(),
       items: playlist,
     })
@@ -214,7 +220,7 @@ impl UnifiedMediaService {
 }
 
 impl UnifiedMediaService {
-  pub fn new(channel_name: &str, config: &UnifiedItemConfig) -> Self {
+  pub fn new(channel_id: &str, config: &UnifiedItemConfig) -> Self {
     let http_version = config.http_version.unwrap_or(2);
 
     let api = if http_version == 1 {
@@ -224,7 +230,9 @@ impl UnifiedMediaService {
     };
 
     Self {
-      channel_name: channel_name.to_owned(),
+      channel_id: channel_id.to_owned(),
+      display_name: config.name.clone(),
+      base_url: config.base_url.clone(),
       api,
       types: Mutex::new(vec![]),
     }

@@ -2,6 +2,22 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetChannelsRequest {}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChannelInfo {
+  pub id: String,
+  pub name: String,
+  pub base_url: String,
+  pub default: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetChannelsResponse {
+  pub channels: Vec<ChannelInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DownloadMediaRequest {
   pub channel: String,
   pub media_id: String,

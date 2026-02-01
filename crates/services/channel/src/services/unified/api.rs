@@ -12,7 +12,7 @@ pub enum StringOrNumber {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TypeItem {
   pub type_id: u32,
-  pub type_pid: u32,
+  pub type_pid: Option<u32>,
   pub type_name: String,
 }
 
@@ -187,8 +187,9 @@ impl UnifiedAPI {
 pub fn parse_root_type(class: &[TypeItem], type_id: u32) -> MediaKind {
   if let Some(c) = class.iter().find(|c| c.type_id == type_id) {
 
-    if c.type_pid != 0 {
-      return parse_root_type(class, c.type_pid);
+    let type_pid = c.type_pid.unwrap_or(0);
+    if type_pid != 0 {
+      return parse_root_type(class, type_pid);
     }
 
     match c.type_name.as_str() {

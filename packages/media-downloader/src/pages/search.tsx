@@ -12,7 +12,7 @@ export interface SearchProps {
 
 const Search: React.FC<SearchProps> = ({ items, keyword }) => {
   return (
-    <div className='flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950'>
+    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto p-4">
           <SearchInput initialValue={keyword} />
@@ -30,7 +30,10 @@ const Search: React.FC<SearchProps> = ({ items, keyword }) => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
           {items.map(item => {
             return (
-              <Link key={item.id} to={`/channels/${item.channel}/media/${item.id}`}>
+              <Link
+                key={item.id}
+                to={`/channels/${item.channel}/media/${item.id}`}
+              >
                 <div className="group cursor-pointer">
                   <AspectRatio ratio={5 / 7}>
                     <img
@@ -56,16 +59,19 @@ const loader = async ({ url }: LoaderContext): Promise<SearchProps> => {
   const search = url.slice(url.indexOf('?'))
   const params = new URLSearchParams(search)
 
-  const keyword = params.get('q')
+  const q = params.get('q')
+  const channel = params.get('channel')
   const page = +(params.get('page') || 1)
 
-  if (!keyword) {
+  if (!q) {
     throw new Error('Keyword is required')
   }
+  const keyword = decodeURIComponent(q)
 
   const { items } = await mediaAPI.search({
-    keyword: decodeURIComponent(keyword),
-    page
+    keyword,
+    channel: channel || undefined,
+    page,
   })
 
   return {

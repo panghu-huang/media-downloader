@@ -4,6 +4,7 @@ import { MediaMetadata, MediaPlaylistItem } from '@/features/media/types'
 
 export interface SearchMediaOptions {
   keyword: string
+  channel?: string
   page?: number
 }
 
