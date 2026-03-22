@@ -1,6 +1,8 @@
 import * as React from 'react'
 import Link from '@coodev/react/link'
+import { router } from '@coodev/react/router'
 import { SearchInput } from '@/components/search-input'
+import { Pagination } from '@/components/ui/pagination'
 import { mediaAPI, MediaMetadata } from '@/features/media'
 import { type LoaderContext } from '@/common/types'
 import { AspectRatio } from '@/components/ui/aspect-ratio'
@@ -8,9 +10,19 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 export interface SearchProps {
   keyword: string
   items: MediaMetadata[]
+  page: number
+  total: number
+  pageSize: number
 }
 
-const Search: React.FC<SearchProps> = ({ items, keyword }) => {
+const Search: React.FC<SearchProps> = ({ items, keyword, page, total, pageSize }) => {
+  const totalPages = Math.ceil(total / pageSize)
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('page', String(newPage))
+    router.push(`/search?${params.toString()}`)
+  }
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
@@ -24,7 +36,7 @@ const Search: React.FC<SearchProps> = ({ items, keyword }) => {
             Search Results
           </h2>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Found {items.length} results for "{keyword}"
+            Found {total} results for "{keyword}"
           </p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -50,6 +62,11 @@ const Search: React.FC<SearchProps> = ({ items, keyword }) => {
             )
           })}
         </div>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
   )
@@ -68,7 +85,7 @@ const loader = async ({ url }: LoaderContext): Promise<SearchProps> => {
   }
   const keyword = decodeURIComponent(q)
 
-  const { items } = await mediaAPI.search({
+  const result = await mediaAPI.search({
     keyword,
     channel: channel || undefined,
     page,
@@ -76,7 +93,10 @@ const loader = async ({ url }: LoaderContext): Promise<SearchProps> => {
 
   return {
     keyword,
-    items,
+    items: result.items,
+    page: result.page,
+    total: result.total,
+    pageSize: result.page_size,
   }
 }
 

@@ -1,13 +1,6 @@
 import * as React from 'react'
 import { router } from '@coodev/react/router'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { channelAPI, Channel } from '@/features/channel'
 
 export interface SearchInputProps {
@@ -66,27 +59,36 @@ const SearchInput: React.FC<SearchInputProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-sm text-slate-600 dark:text-slate-400">
-          Channel:
-        </span>
-        <Select value={currentChannel} onValueChange={handleChannelChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select channel" />
-          </SelectTrigger>
-          <SelectContent>
-            {channels.map(ch => (
-              <SelectItem key={ch.id} value={ch.id}>
-                {ch.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="relative flex-1">
+    <div className="relative flex items-center h-12 bg-white dark:bg-slate-950 rounded-lg shadow border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div className="flex items-center border-r border-slate-200 dark:border-slate-800 pr-3">
+        <select
+          value={currentChannel}
+          onChange={(e) => handleChannelChange(e.target.value)}
+          className="h-12 w-[140px] pl-3 bg-transparent border-0 text-sm focus:outline-none focus:ring-0 cursor-pointer appearance-none"
+        >
+          {channels.map(ch => (
+            <option key={ch.id} value={ch.id}>
+              {ch.name}
+            </option>
+          ))}
+        </select>
         <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400"
+          className="h-4 w-4 text-slate-400 pointer-events-none"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
+      <div className="relative flex-1 flex items-center">
+        <svg
+          className="absolute left-3 h-5 w-5 text-slate-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -104,7 +106,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           value={keyword}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          className="pl-10 h-12 text-base shadow-lg"
+          className="pl-10 h-full border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-base bg-transparent"
         />
       </div>
     </div>

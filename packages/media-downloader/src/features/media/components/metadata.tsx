@@ -8,7 +8,7 @@ export interface MetadataProps {
 
 const Metadata: React.FC<MetadataProps> = ({ metadata }) => {
   return (
-    <div className="flex flex-col md:flex-row gap-6 bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg">
+    <div className="flex flex-col md:flex-row gap-6">
       <div className="w-full md:w-64 flex-shrink-0">
         <AspectRatio ratio={5 / 7}>
           <img

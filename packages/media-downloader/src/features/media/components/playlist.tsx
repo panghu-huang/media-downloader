@@ -24,7 +24,7 @@ const Playlist: React.FC<PlaylistProps> = ({
   onToggle,
 }) => {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg">
+    <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
           Episodes

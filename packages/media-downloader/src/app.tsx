@@ -4,6 +4,10 @@ import type { LoaderContext } from '@/common/types'
 import { Error, ErrorProps } from './components/error'
 import { NotFound } from './components/not-found'
 import { ToastProvider } from '@/components/ui/toast'
+import {
+  ProgressBarProvider,
+  progressBarController,
+} from '@/components/progress-bar'
 
 type PageProps = ErrorProps | object
 
@@ -15,15 +19,16 @@ const Main: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   )
 }
 
-const App: React.FC<AppProps<PageProps>> = ({ Component, pageProps }) => {
+const AppContent: React.FC<AppProps<PageProps>> = ({
+  Component,
+  pageProps,
+}) => {
   if ('isError' in pageProps && pageProps.isError) {
     return <Error {...(pageProps as ErrorProps)} />
   }
 
   if (!Component) {
-    return (
-      <NotFound />
-    )
+    return <NotFound />
   }
 
   return (
@@ -33,8 +38,18 @@ const App: React.FC<AppProps<PageProps>> = ({ Component, pageProps }) => {
   )
 }
 
+const App: React.FC<AppProps<PageProps>> = props => {
+  return (
+    <ProgressBarProvider>
+      <AppContent {...props} />
+    </ProgressBarProvider>
+  )
+}
+
 App.getInitialProps = async ({ Component, ...ctx }: ReactRenderContext) => {
   try {
+    progressBarController.start()
+
     if (Component && Component.getInitialProps) {
       const loaderContext: LoaderContext = ctx
 
@@ -51,6 +66,8 @@ App.getInitialProps = async ({ Component, ...ctx }: ReactRenderContext) => {
         stack: typedError.stack,
       },
     }
+  } finally {
+    progressBarController.complete()
   }
 }
 

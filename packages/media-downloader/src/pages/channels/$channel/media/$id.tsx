@@ -71,31 +71,39 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
           <SearchInput />
         </div>
       </div>
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <Metadata metadata={metadata} />
-        <Playlist
-          playlist={playlist}
-          start={start}
-          end={end}
-          onToggle={toggle}
-        />
-        <div className="flex items-center justify-between bg-white dark:bg-slate-900 rounded-xl p-6 shadow-lg">
-          <div>
-            {selectedCount > 0 && (
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                {selectedCount} episode{selectedCount > 1 ? 's' : ''} selected
-              </p>
-            )}
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow">
+          <div className="p-6">
+            <Metadata metadata={metadata} />
           </div>
-          <Button
-            disabled={start === undefined && end === undefined}
-            onClick={download}
-            className="px-8 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-colors"
-          >
-            {selectedCount > 0
-              ? `Download ${selectedCount} Episode${selectedCount > 1 ? 's' : ''}`
-              : 'Select Episodes'}
-          </Button>
+          <div className="border-t border-slate-200 dark:border-slate-800 mx-6" />
+          <div className="p-6">
+            <Playlist
+              playlist={playlist}
+              start={start}
+              end={end}
+              onToggle={toggle}
+            />
+          </div>
+          <div className="border-t border-slate-200 dark:border-slate-800 mx-6" />
+          <div className="flex items-center justify-between p-6">
+            <div>
+              {selectedCount > 0 && (
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  {selectedCount} episode{selectedCount > 1 ? 's' : ''} selected
+                </p>
+              )}
+            </div>
+            <Button
+              disabled={start === undefined && end === undefined}
+              onClick={download}
+              className="px-8 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 transition-colors"
+            >
+              {selectedCount > 0
+                ? `Download ${selectedCount} Episode${selectedCount > 1 ? 's' : ''}`
+                : 'Select Episodes'}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
