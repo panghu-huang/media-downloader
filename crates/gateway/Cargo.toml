@@ -10,6 +10,7 @@ aggregation = { workspace = true }
 protocol = { workspace = true }
 models = { workspace = true }
 rpc-client = { workspace = true }
+task-manager = { workspace = true }
 
 # External dependencies
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "signal"] }
@@ -25,3 +26,5 @@ http-body-util = { workspace = true }
 tower-http = { workspace = true, features = ["cors"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["time", "chrono"] }
+tokio-stream = { workspace = true, features = ["sync"] }
+futures = "0.3"

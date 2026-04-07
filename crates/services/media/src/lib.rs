@@ -12,11 +12,14 @@ use rpc_client::RpcClient;
 use std::ops::AddAssign;
 use std::path::Path;
 use std::path::PathBuf;
+use std::sync::Arc;
+use task_manager::TaskManager;
 use utils::rename_file;
 
 pub struct MediaService {
   media_dir: PathBuf,
   rpc_client: RpcClient,
+  task_manager: Arc<TaskManager>,
   // connection_pool: ConnectionPool,
 }
 
@@ -33,16 +36,28 @@ impl MediaExt for MediaService {
       request.number
     );
 
+    let task_id = self.task_manager.create_task(
+      request.channel.clone(),
+      request.media_id.clone(),
+      request.media_id.clone(),
+      request.number,
+    );
+
     tokio::spawn({
       let channel_client = self.rpc_client.channel.clone();
+      let task_manager = self.task_manager.clone();
       async move {
-        if let Err(err) = Self::download_media(channel_client, request.clone()).await {
+        if let Err(err) =
+          Self::download_media_with_tracking(channel_client, request.clone(), &task_manager, &task_id)
+            .await
+        {
           log::info!(
             "Failed to download media {}(#{:?}): {}",
             request.media_id,
             request.number,
             err,
           );
+          task_manager.task_failed(&task_id, &err.to_string());
         }
       }
     });
@@ -102,7 +117,6 @@ impl MediaExt for MediaService {
     &self,
     request: Request<BatchDownloadMediaRequest>,
   ) -> tonic::Result<Response<protocol::Empty>> {
-    // TODO: Validate download range
     let request = request.into_inner();
     log::info!(
       "Downloading media {} in batch (#{:?} - {})",
@@ -120,21 +134,37 @@ impl MediaExt for MediaService {
       .await?
       .into_inner();
 
+    let task_ids: Vec<String> = (0..request.count)
+      .map(|idx| {
+        let ep = request.start_number + (idx as u32);
+        self.task_manager.create_task(
+          request.channel.clone(),
+          request.media_id.clone(),
+          metadata.name.clone(),
+          Some(ep),
+        )
+      })
+      .collect();
+
     tokio::spawn({
       let batch_request = request.clone();
       let media_dir = self.media_dir.clone();
+      let task_manager = self.task_manager.clone();
 
       async move {
         for idx in 0..batch_request.count {
           let start_number = batch_request.start_number + (idx as u32);
+          let task_id = &task_ids[idx as usize];
 
-          if let Err(err) = Self::download_media(
+          if let Err(err) = Self::download_media_with_tracking(
             channel_client.clone(),
             DownloadMediaRequest {
               channel: batch_request.channel.clone(),
               media_id: batch_request.media_id.clone(),
               number: Some(start_number),
             },
+            &task_manager,
+            task_id,
           )
           .await
           .and_then(|local_path| {
@@ -151,6 +181,16 @@ impl MediaExt for MediaService {
               err,
             );
 
+            task_manager.task_failed(task_id, &err.to_string());
+
+            // Mark remaining tasks as cancelled
+            for remaining_idx in (idx + 1)..batch_request.count {
+              task_manager.task_failed(
+                &task_ids[remaining_idx as usize],
+                "Cancelled: previous episode failed",
+              );
+            }
+
             break;
           }
         }
@@ -164,9 +204,11 @@ impl MediaExt for MediaService {
 }
 
 impl MediaService {
-  async fn download_media(
+  async fn download_media_with_tracking(
     mut channel_client: protocol::channel::ChannelClient<tonic::transport::Channel>,
     request: DownloadMediaRequest,
+    task_manager: &TaskManager,
+    task_id: &str,
   ) -> anyhow::Result<PathBuf> {
     let res = channel_client.download_media(request).await?;
 
@@ -180,6 +222,7 @@ impl MediaService {
       match evt {
         protocol::DownloadProgressItem::Done { local_path, .. } => {
           log::info!("Download done: {}", local_path);
+          task_manager.task_completed(task_id);
           return Ok(PathBuf::from(local_path));
         }
         protocol::DownloadProgressItem::Started {
@@ -187,10 +230,16 @@ impl MediaService {
           ..
         } => {
           total = Some(total_segments_of_media);
+          task_manager.task_started(task_id, total_segments_of_media);
         }
         protocol::DownloadProgressItem::SegmentDownloaded { .. } => {
           finished.add_assign(1);
           log::info!("Downloading ... {}/{}", finished, total.unwrap_or(0));
+          task_manager.task_segment_downloaded(task_id);
+        }
+        protocol::DownloadProgressItem::TransformingVideo { .. } => {
+          log::info!("Transforming video...");
+          task_manager.task_transforming(task_id);
         }
         _ => {
           log::info!("Event {:#?}", evt);
@@ -312,10 +361,11 @@ impl MediaService {
 }
 
 impl MediaService {
-  pub fn new(rpc_client: &RpcClient) -> Self {
+  pub fn new(rpc_client: &RpcClient, task_manager: Arc<TaskManager>) -> Self {
     Self {
       media_dir: media_dir(),
       rpc_client: rpc_client.clone(),
+      task_manager,
       // connection_pool: connection_pool.clone(),
     }
   }

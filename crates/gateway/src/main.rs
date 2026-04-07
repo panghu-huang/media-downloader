@@ -3,6 +3,7 @@ use configuration::Configuration;
 use gateway::Gateway;
 // use models::ConnectionPool;
 use rpc_client::RpcClient;
+use task_manager::TaskManager;
 use tracing_subscriber::fmt::time::ChronoLocal;
 
 #[tokio::main]
@@ -16,9 +17,11 @@ pub async fn main() -> anyhow::Result<()> {
   let client = RpcClient::try_from(&config)?;
   // let connection_pool = ConnectionPool::connect(&config.database.url).await?;
 
-  let aggregation = create_aggregation_service(&config, &client);
+  let task_manager = TaskManager::new();
 
-  let gateway = Gateway::new(client, config.clone());
+  let aggregation = create_aggregation_service(&config, &client, task_manager.clone());
+
+  let gateway = Gateway::new(client, config.clone(), task_manager);
 
   let gateway_addr = config
     .app

@@ -11,8 +11,9 @@ members = [
   "crates/configuration",
   "crates/services/aggregation",
   "tests/integration-tests", 
-  "crates/stream", 
+  "crates/stream",
   "crates/terminal",
+  "crates/task-manager",
 ]
 default-members = ["crates/gateway"]
 
@@ -47,6 +48,7 @@ regex = "1.10.6"
 m3u8-rs = "6.0.0"
 url = "2.5.2"
 parking_lot = "0.12.3"
+uuid = { version = "1", features = ["v4"] }
 ratatui = "0.28.0"
 crossterm = "0.28.1"
 async-recursion = "1.1.1"
@@ -58,6 +60,7 @@ protocol = { path = "crates/protocol" }
 rpc-client = { path = "crates/rpc-client" }
 configuration = { path = "crates/configuration" }
 stream = { path = "crates/stream" }
+task-manager = { path = "crates/task-manager" }
 
 ## Services
 aggregation = { path = "crates/services/aggregation" }

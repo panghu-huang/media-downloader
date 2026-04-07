@@ -8,6 +8,8 @@ use protocol::tonic::transport::server::Router;
 use protocol::tonic::transport::Server;
 use rpc_client::RpcClient;
 use std::net::SocketAddr;
+use std::sync::Arc;
+use task_manager::TaskManager;
 
 pub struct AggregationService {
   channel: ChannelService,
@@ -45,9 +47,10 @@ impl AggregationService {
 pub fn create_aggregation_service(
   configuration: &Configuration,
   rpc_client: &RpcClient,
+  task_manager: Arc<TaskManager>,
 ) -> AggregationService {
   let channel = ChannelService::new(configuration);
-  let media = MediaService::new(rpc_client);
+  let media = MediaService::new(rpc_client, task_manager);
 
   AggregationService { channel, media }
 }

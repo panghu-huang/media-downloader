@@ -10,10 +10,12 @@ use axum::http::{HeaderValue, Method};
 use axum::routing::{get, post};
 use axum::Router;
 use configuration::Configuration;
-use controllers::{channel, media};
+use controllers::{channel, downloads, media};
 use rpc_client::RpcClient;
 use state::AppState;
 use std::net::SocketAddr;
+use std::sync::Arc;
+use task_manager::TaskManager;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -22,11 +24,16 @@ pub type Result<T> = std::result::Result<T, error::AppError>;
 pub struct Gateway {
   pub client: RpcClient,
   pub config: Configuration,
+  pub task_manager: Arc<TaskManager>,
 }
 
 impl Gateway {
-  pub fn new(client: RpcClient, config: Configuration) -> Self {
-    Self { client, config }
+  pub fn new(client: RpcClient, config: Configuration, task_manager: Arc<TaskManager>) -> Self {
+    Self {
+      client,
+      config,
+      task_manager,
+    }
   }
 
   pub async fn serve(&self, addr: SocketAddr) -> Result<()> {
@@ -44,7 +51,7 @@ impl Gateway {
   }
 
   pub fn router(&self) -> Router {
-    let state = AppState::new(self.client.clone(), self.config.clone());
+    let state = AppState::new(self.client.clone(), self.config.clone(), self.task_manager.clone());
 
     let router = Router::new()
       .route("/channels", get(channel::get_channels))
@@ -59,6 +66,8 @@ impl Gateway {
       .route("/media/download", post(media::download_media))
       .route("/media/batch_download", post(media::batch_download_media))
       .route("/media/search", get(media::search_media))
+      .route("/downloads", get(downloads::list_downloads))
+      .route("/downloads/events", get(downloads::download_events_sse))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))
       // Add a revision to the response headers

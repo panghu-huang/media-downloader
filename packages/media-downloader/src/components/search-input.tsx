@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Link from '@coodev/react/link'
 import { router } from '@coodev/react/router'
 import { Input } from '@/components/ui/input'
 import { channelAPI, Channel } from '@/features/channel'
@@ -59,7 +60,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
   }
 
   return (
-    <div className="relative flex items-center h-12 bg-white dark:bg-slate-950 rounded-lg shadow border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div className="flex items-center gap-3">
+    <div className="relative flex items-center h-12 flex-1 bg-white dark:bg-slate-950 rounded-lg shadow border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div className="flex items-center border-r border-slate-200 dark:border-slate-800 pr-3">
         <select
           value={currentChannel}
@@ -109,6 +111,14 @@ const SearchInput: React.FC<SearchInputProps> = ({
           className="pl-10 h-full border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-base bg-transparent"
         />
       </div>
+    </div>
+    <Link to="/downloads">
+      <div className="flex items-center justify-center h-12 w-12 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer" title="Downloads">
+        <svg className="h-5 w-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+    </Link>
     </div>
   )
 }

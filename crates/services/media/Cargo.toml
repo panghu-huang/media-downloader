@@ -8,6 +8,7 @@ edition = "2021"
 protocol = { workspace = true }
 rpc-client = { workspace = true }
 models = { workspace = true }
+task-manager = { workspace = true }
 
 # External dependencies
 tokio = { workspace = true }

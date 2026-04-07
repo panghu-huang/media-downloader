@@ -16,5 +16,6 @@ channel = { workspace = true }
 media = { workspace = true }
 protocol = { workspace = true }
 rpc-client = { workspace = true }
+task-manager = { workspace = true }
 models = { workspace = true }
 testing = { workspace = true, optional = true }

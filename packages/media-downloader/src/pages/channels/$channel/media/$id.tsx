@@ -7,6 +7,7 @@ import {
   Playlist,
   mediaAPI,
 } from '@/features/media'
+import { router } from '@coodev/react/router'
 import { useSelection } from '@/hooks/use-selection'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
@@ -51,6 +52,10 @@ const Details: React.FC<DetailsProps> = ({ metadata, playlist }) => {
       )
 
       clearSelection()
+
+      setTimeout(() => {
+        router.push('/downloads')
+      }, 500)
     } catch (err) {
       console.error(err)
       toast('Failed to start download', 'error')

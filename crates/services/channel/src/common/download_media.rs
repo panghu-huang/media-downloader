@@ -119,7 +119,7 @@ async fn download_with_ffmpeg_progress(
               progress_pct
             );
 
-            // stream_clone.segment_downloaded(&msg);
+            stream_clone.segment_downloaded(&msg);
             log::info!("{}", msg);
             last_reported_time = current_time;
           }
