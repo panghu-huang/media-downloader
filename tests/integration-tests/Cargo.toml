@@ -17,6 +17,7 @@ aggregation = { workspace = true, features = ["testing"] }
 protocol = { workspace = true }
 models = { workspace = true }
 rpc-client = { workspace = true }
+task-manager = { workspace = true }
 
 # External dependencies
 anyhow = { workspace = true }

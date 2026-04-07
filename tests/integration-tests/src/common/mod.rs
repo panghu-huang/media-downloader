@@ -3,6 +3,7 @@ use configuration::{Configuration, Environment};
 use gateway::Gateway;
 // use models::ConnectionPool;
 use rpc_client::RpcClient;
+use task_manager::TaskManager;
 use testing::protocol::create_testing_channel;
 // use tracing_subscriber::fmt::time::ChronoLocal;
 
@@ -32,11 +33,13 @@ pub async fn setup_testing() -> Gateway {
 
   // let connection_pool = ConnectionPool::connect(&config.database.url).await.unwrap();
 
-  let aggregation = create_aggregation_service(&config, &client);
+  let task_manager = TaskManager::new();
+
+  let aggregation = create_aggregation_service(&config, &client, task_manager.clone());
 
   tokio::task::spawn(async move {
     aggregation.serve_with_incoming(server).await.unwrap();
   });
 
-  Gateway::new(client, config)
+  Gateway::new(client, config, task_manager)
 }
