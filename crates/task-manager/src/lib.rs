@@ -101,7 +101,8 @@ impl TaskManager {
       task.downloaded_segments += 1;
       if let Some(total) = task.total_segments {
         if total > 0 {
-          task.progress = ((task.downloaded_segments as f64 / total as f64) * 100.0).min(99.0) as u8;
+          task.progress =
+            ((task.downloaded_segments as f64 / total as f64) * 100.0).min(99.0) as u8;
         }
       }
     });
@@ -129,12 +130,48 @@ impl TaskManager {
   }
 
   pub fn list_tasks(&self) -> Vec<DownloadTask> {
-    self.cleanup_old_tasks();
-
     let tasks = self.tasks.read();
     let mut list: Vec<DownloadTask> = tasks.values().cloned().collect();
     list.sort_by(|a, b| b.created_at.cmp(&a.created_at));
     list
+  }
+
+  /// Start a background task that periodically cleans up expired tasks.
+  /// Runs every 5 minutes. Call once at startup.
+  pub fn start_periodic_cleanup(self: &Arc<Self>) {
+    let this = self.clone();
+    tokio::spawn(async move {
+      let mut interval = tokio::time::interval(std::time::Duration::from_secs(300));
+      loop {
+        interval.tick().await;
+        let removed = this.cleanup_expired();
+        if removed > 0 {
+          log::info!("Periodic cleanup: removed {} expired tasks", removed);
+        }
+      }
+    });
+  }
+
+  /// Manually cleanup expired tasks. Returns the number of tasks removed.
+  /// - Active tasks (Downloading, Transforming) are never removed.
+  /// - Pending / Completed / Failed clean after 7 days.
+  pub fn cleanup_expired(&self) -> usize {
+    let now = Utc::now();
+    let mut tasks = self.tasks.write();
+    let before = tasks.len();
+
+    tasks.retain(|_, task| match task.status {
+      TaskStatus::Downloading | TaskStatus::Transforming => true,
+      TaskStatus::Pending => {
+        let age = now.signed_duration_since(task.updated_at);
+        age.num_days() < 7
+      }
+      TaskStatus::Completed | TaskStatus::Failed => {
+        let age = now.signed_duration_since(task.updated_at);
+        age.num_days() < 7
+      }
+    });
+    before - tasks.len()
   }
 
   pub fn subscribe(&self) -> broadcast::Receiver<TaskEvent> {
@@ -161,18 +198,5 @@ impl TaskManager {
   fn broadcast(&self, event: TaskEvent) {
     // Ignore send errors (no active receivers)
     let _ = self.sender.send(event);
-  }
-
-  fn cleanup_old_tasks(&self) {
-    let now = Utc::now();
-    let mut tasks = self.tasks.write();
-    tasks.retain(|_, task| {
-      if task.status == TaskStatus::Completed || task.status == TaskStatus::Failed {
-        let age = now.signed_duration_since(task.updated_at);
-        age.num_minutes() < 60
-      } else {
-        true
-      }
-    });
   }
 }

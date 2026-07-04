@@ -68,6 +68,7 @@ impl Gateway {
       .route("/media/search", get(media::search_media))
       .route("/downloads", get(downloads::list_downloads))
       .route("/downloads/events", get(downloads::download_events_sse))
+      .route("/downloads/cleanup", post(downloads::cleanup_downloads))
       // Log incoming requests and responses
       .layer(axum::middleware::from_fn(middlewares::logging))
       // Add a revision to the response headers

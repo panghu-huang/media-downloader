@@ -3001,6 +3001,7 @@ name = "task-manager"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "log",
  "parking_lot",
  "serde",
  "serde_json",

@@ -4,6 +4,7 @@ use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::response::Json;
 use futures::stream::{self, Stream};
 use futures::StreamExt;
+use serde::Serialize;
 use std::convert::Infallible;
 use task_manager::DownloadTask;
 use tokio_stream::wrappers::BroadcastStream;
@@ -36,4 +37,16 @@ pub async fn download_events_sse(
   });
 
   Sse::new(init_event.chain(update_events)).keep_alive(KeepAlive::default())
+}
+
+#[derive(Serialize)]
+pub struct CleanupResponse {
+  pub removed: usize,
+}
+
+/// Handler for `POST /api/v1/downloads/cleanup`
+pub async fn cleanup_downloads(State(state): State<AppState>) -> Json<CleanupResponse> {
+  let removed = state.task_manager.cleanup_expired();
+  log::info!("Manual cleanup: removed {} expired tasks", removed);
+  Json(CleanupResponse { removed })
 }

@@ -182,7 +182,10 @@ fn parse_time_string(time_str: &str) -> Option<f64> {
 #[async_recursion::async_recursion]
 async fn fetch_media_playlist(download_url: &str) -> anyhow::Result<MediaPlaylist> {
   log::info!("Starting fetch media playlist: {}", download_url);
-  let client = Client::new();
+  let client = Client::builder()
+    .connect_timeout(std::time::Duration::from_secs(10))
+    .timeout(std::time::Duration::from_secs(30))
+    .build()?;
 
   let res = client.get(download_url).send().await?;
 

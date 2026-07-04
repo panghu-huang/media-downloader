@@ -18,6 +18,7 @@ pub async fn main() -> anyhow::Result<()> {
   // let connection_pool = ConnectionPool::connect(&config.database.url).await?;
 
   let task_manager = TaskManager::new();
+  task_manager.start_periodic_cleanup();
 
   let aggregation = create_aggregation_service(&config, &client, task_manager.clone());
 
